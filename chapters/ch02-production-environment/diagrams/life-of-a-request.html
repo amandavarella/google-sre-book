@@ -31,7 +31,7 @@
     min-height:100vh;
     padding:28px 20px 60px;
   }
-  .wrap{max-width:1200px; margin:0 auto;}
+  .wrap{max-width:1440px; margin:0 auto;}
   header{margin-bottom:22px;}
   .eyebrow{
     font-family:'JetBrains Mono', monospace;
@@ -45,8 +45,8 @@
   }
   .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:640px; line-height:1.5;}
 
-  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px;}
-  @media(min-width:980px){ .layout{grid-template-columns: 2.05fr 1fr;} }
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px; align-items:start;}
+  @media(min-width:1100px){ .layout{grid-template-columns: 2.5fr 1fr;} }
 
   .stage{
     background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
@@ -54,18 +54,18 @@
   }
   svg{width:100%; height:auto; display:block;}
 
-  .node rect{fill:var(--node-fill); stroke:#2A3B55; stroke-width:1.4; rx:8;}
-  .node.active rect{fill:var(--node-active); stroke:var(--req); stroke-width:2;}
+  .node rect{fill:var(--node-fill); stroke:#2A3B55; stroke-width:1.8; rx:10;}
+  .node.active rect{fill:var(--node-active); stroke:var(--req); stroke-width:2.8;}
   .node.active.resActive rect{stroke:var(--res);}
   .node text{fill:var(--text); font-family:'Inter',sans-serif;}
-  .node .label{font-size:13px; font-weight:600;}
-  .node .sublabel{font-size:10px; fill:var(--text-dim); font-family:'JetBrains Mono',monospace;}
+  .node .label{font-size:21px; font-weight:700;}
+  .node .sublabel{font-size:14px; fill:var(--text-dim); font-family:'JetBrains Mono',monospace;}
 
-  .edge{stroke:#2A3B55; stroke-width:1.6; fill:none;}
-  .edge.req-active{stroke:var(--req); stroke-width:2.6; filter:drop-shadow(0 0 5px rgba(94,234,212,0.55));}
-  .edge.res-active{stroke:var(--res); stroke-width:2.6; filter:drop-shadow(0 0 5px rgba(251,191,36,0.55));}
-  .edge.gslb{stroke:var(--gslb); stroke-width:1.6; stroke-dasharray:4 4; opacity:0.35;}
-  .edge.gslb.active{opacity:1; filter:drop-shadow(0 0 5px rgba(244,114,182,0.55));}
+  .edge{stroke:#2A3B55; stroke-width:2.2; fill:none;}
+  .edge.req-active{stroke:var(--req); stroke-width:3.4; filter:drop-shadow(0 0 6px rgba(94,234,212,0.55));}
+  .edge.res-active{stroke:var(--res); stroke-width:3.4; filter:drop-shadow(0 0 6px rgba(251,191,36,0.55));}
+  .edge.gslb{stroke:var(--gslb); stroke-width:2.2; stroke-dasharray:6 6; opacity:0.35;}
+  .edge.gslb.active{opacity:1; filter:drop-shadow(0 0 6px rgba(244,114,182,0.55));}
 
   .dot{fill:#fff; filter:drop-shadow(0 0 6px rgba(255,255,255,0.9));}
 
@@ -140,83 +140,83 @@
 
   <div class="layout">
     <div class="stage">
-      <svg id="diagram" viewBox="0 0 1180 640" xmlns="http://www.w3.org/2000/svg">
+      <svg id="diagram" viewBox="0 35 1255 655" xmlns="http://www.w3.org/2000/svg">
 
         <!-- ===== EDGES (drawn first, under nodes) ===== -->
         <!-- User <-> Browser -->
-        <path id="e-user-browser" class="edge" d="M 130 355 L 235 355"/>
+        <path id="e-user-browser" class="edge" d="M 130 400 L 195 400"/>
         <!-- Browser <-> DNS -->
-        <path id="e-browser-dns" class="edge" d="M 300 330 L 300 175 L 400 175" />
+        <path id="e-browser-dns" class="edge" d="M 277 348 L 277 155"/>
         <!-- DNS <-> GSLB -->
-        <path id="e-dns-gslb" class="edge gslb" d="M 500 175 L 700 175 L 700 260"/>
+        <path id="e-dns-gslb" class="edge gslb" d="M 365 107 L 570 107"/>
         <!-- Browser <-> GFE -->
-        <path id="e-browser-gfe" class="edge" d="M 340 355 L 460 355"/>
+        <path id="e-browser-gfe" class="edge" d="M 360 400 L 420 400"/>
         <!-- GFE <-> GSLB -->
-        <path id="e-gfe-gslb" class="edge gslb" d="M 620 340 L 660 300"/>
+        <path id="e-gfe-gslb" class="edge gslb" d="M 545 348 L 620 155"/>
         <!-- GFE <-> App Frontend -->
-        <path id="e-gfe-frontend" class="edge" d="M 660 340 L 790 260"/>
+        <path id="e-gfe-frontend" class="edge" d="M 595 400 L 790 400"/>
         <!-- Frontend <-> GSLB -->
-        <path id="e-frontend-gslb" class="edge gslb" d="M 790 300 L 745 300"/>
+        <path id="e-frontend-gslb" class="edge gslb" d="M 850 348 L 715 155"/>
         <!-- Frontend <-> Backend -->
-        <path id="e-frontend-backend" class="edge" d="M 860 300 L 860 380"/>
+        <path id="e-frontend-backend" class="edge" d="M 890 453 L 890 560"/>
         <!-- Backend <-> Bigtable -->
-        <path id="e-backend-bigtable" class="edge" d="M 940 420 L 1040 420"/>
+        <path id="e-backend-bigtable" class="edge" d="M 990 612 L 1060 612"/>
 
         <!-- ===== NODES ===== -->
         <g class="node" id="n-user">
-          <rect x="55" y="325" width="70" height="60"/>
-          <text class="label" x="90" y="352" text-anchor="middle">User</text>
-          <text class="sublabel" x="90" y="368" text-anchor="middle">person</text>
+          <rect x="20" y="358" width="110" height="85"/>
+          <text class="label" x="75" y="396" text-anchor="middle">User</text>
+          <text class="sublabel" x="75" y="420" text-anchor="middle">person</text>
         </g>
 
         <g class="node" id="n-browser">
-          <rect x="235" y="320" width="105" height="70"/>
-          <text class="label" x="287" y="350" text-anchor="middle">Browser</text>
-          <text class="sublabel" x="287" y="366" text-anchor="middle">the only thing</text>
-          <text class="sublabel" x="287" y="378" text-anchor="middle">the user touches</text>
+          <rect x="195" y="348" width="165" height="105"/>
+          <text class="label" x="277" y="386" text-anchor="middle">Browser</text>
+          <text class="sublabel" x="277" y="410" text-anchor="middle">the only thing</text>
+          <text class="sublabel" x="277" y="429" text-anchor="middle">the user touches</text>
         </g>
 
         <g class="node" id="n-dns">
-          <rect x="400" y="140" width="100" height="70"/>
-          <text class="label" x="450" y="170" text-anchor="middle">Google DNS</text>
-          <text class="sublabel" x="450" y="186" text-anchor="middle">name → IP</text>
+          <rect x="190" y="60" width="175" height="95"/>
+          <text class="label" x="277" y="103" text-anchor="middle">Google DNS</text>
+          <text class="sublabel" x="277" y="127" text-anchor="middle">name → IP</text>
         </g>
 
         <g class="node" id="n-gslb">
-          <rect x="660" y="260" width="90" height="55"/>
-          <text class="label" x="705" y="285" text-anchor="middle" font-size="12">GSLB</text>
-          <text class="sublabel" x="705" y="300" text-anchor="middle">global load balancer</text>
+          <rect x="570" y="60" width="195" height="95"/>
+          <text class="label" x="667" y="103" text-anchor="middle">GSLB</text>
+          <text class="sublabel" x="667" y="127" text-anchor="middle">global load balancer</text>
         </g>
 
         <g class="node" id="n-gfe">
-          <rect x="460" y="320" width="110" height="70"/>
-          <text class="label" x="515" y="348" text-anchor="middle">GFE</text>
-          <text class="sublabel" x="515" y="364" text-anchor="middle">reverse proxy</text>
-          <text class="sublabel" x="515" y="378" text-anchor="middle">(Google Front End)</text>
+          <rect x="420" y="348" width="175" height="105"/>
+          <text class="label" x="507" y="386" text-anchor="middle">GFE</text>
+          <text class="sublabel" x="507" y="410" text-anchor="middle">reverse proxy</text>
+          <text class="sublabel" x="507" y="429" text-anchor="middle">(Google Front End)</text>
         </g>
 
         <g class="node" id="n-frontend">
-          <rect x="790" y="225" width="120" height="70"/>
-          <text class="label" x="850" y="253" text-anchor="middle">App Frontend</text>
-          <text class="sublabel" x="850" y="269" text-anchor="middle">Shakespeare service</text>
-          <text class="sublabel" x="850" y="281" text-anchor="middle">builds protobuf</text>
+          <rect x="790" y="348" width="200" height="105"/>
+          <text class="label" x="890" y="386" text-anchor="middle">App Frontend</text>
+          <text class="sublabel" x="890" y="410" text-anchor="middle">Shakespeare service</text>
+          <text class="sublabel" x="890" y="429" text-anchor="middle">builds protobuf</text>
         </g>
 
         <g class="node" id="n-backend">
-          <rect x="800" y="380" width="120" height="70"/>
-          <text class="label" x="860" y="410" text-anchor="middle">App Backend</text>
-          <text class="sublabel" x="860" y="426" text-anchor="middle">Shakespeare service</text>
-          <text class="sublabel" x="860" y="438" text-anchor="middle">runs the lookup</text>
+          <rect x="790" y="560" width="200" height="105"/>
+          <text class="label" x="890" y="598" text-anchor="middle">App Backend</text>
+          <text class="sublabel" x="890" y="622" text-anchor="middle">Shakespeare service</text>
+          <text class="sublabel" x="890" y="641" text-anchor="middle">runs the lookup</text>
         </g>
 
         <g class="node" id="n-bigtable">
-          <rect x="1040" y="390" width="110" height="60"/>
-          <text class="label" x="1095" y="415" text-anchor="middle" font-size="13">Bigtable</text>
-          <text class="sublabel" x="1095" y="431" text-anchor="middle">word index</text>
+          <rect x="1060" y="567" width="170" height="90"/>
+          <text class="label" x="1145" y="608" text-anchor="middle">Bigtable</text>
+          <text class="sublabel" x="1145" y="632" text-anchor="middle">word index</text>
         </g>
 
         <!-- moving dot -->
-        <circle id="dot" class="dot" r="5" cx="-50" cy="-50"/>
+        <circle id="dot" class="dot" r="7" cx="-50" cy="-50"/>
       </svg>
     </div>
 
@@ -269,8 +269,8 @@
 
 <script>
 const nodePositions = {
-  user:{x:90, y:355}, browser:{x:287,y:355}, dns:{x:450,y:175}, gslb:{x:705,y:288},
-  gfe:{x:515,y:355}, frontend:{x:850,y:260}, backend:{x:860,y:415}, bigtable:{x:1095,y:420}
+  user:{x:75, y:400}, browser:{x:277,y:400}, dns:{x:277,y:107}, gslb:{x:667,y:107},
+  gfe:{x:507,y:400}, frontend:{x:890,y:400}, backend:{x:890,y:612}, bigtable:{x:1145,y:612}
 };
 
 // Each step: nodes to activate, edges (id, class req/res), gslb edge id if any, and text
