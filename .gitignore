@@ -2,3 +2,7 @@
 .vscode/
 .idea/
 *.swp
+
+# Personal, machine-local Claude Code context and settings
+CLAUDE.local.md
+.claude/settings.local.json

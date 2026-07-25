@@ -91,6 +91,12 @@ least one `'res'` step and one `multiEdge` step after touching any coordinates, 
 exercise paths the opening view does not. Check a narrow viewport too; the layout stacks below
 1100px.
 
+## Local overrides
+
+`CLAUDE.local.md` and `.claude/settings.local.json` are git-ignored and hold personal,
+machine-specific context and settings. Put anything provisional or machine-bound there;
+this file is for conventions that apply to everyone reading the repo.
+
 ## Repo constraints
 
 - The `amandavarella` token lacks the `workflow` scope, so GitHub Actions workflow files cannot
