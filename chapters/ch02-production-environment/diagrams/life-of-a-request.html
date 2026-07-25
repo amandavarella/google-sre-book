@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Life of a Request</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;      /* forward/request path — cyan */
+    --res:#FBBF24;      /* return/response path — amber */
+    --gslb:#F472B6;     /* GSLB lookups — pink, dashed */
+    --node-fill:#0F1A2B;
+    --node-active:#16283F;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1200px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:640px; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px;}
+  @media(min-width:980px){ .layout{grid-template-columns: 2.05fr 1fr;} }
+
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:14px; position:relative; overflow:hidden;
+  }
+  svg{width:100%; height:auto; display:block;}
+
+  .node rect{fill:var(--node-fill); stroke:#2A3B55; stroke-width:1.4; rx:8;}
+  .node.active rect{fill:var(--node-active); stroke:var(--req); stroke-width:2;}
+  .node.active.resActive rect{stroke:var(--res);}
+  .node text{fill:var(--text); font-family:'Inter',sans-serif;}
+  .node .label{font-size:13px; font-weight:600;}
+  .node .sublabel{font-size:10px; fill:var(--text-dim); font-family:'JetBrains Mono',monospace;}
+
+  .edge{stroke:#2A3B55; stroke-width:1.6; fill:none;}
+  .edge.req-active{stroke:var(--req); stroke-width:2.6; filter:drop-shadow(0 0 5px rgba(94,234,212,0.55));}
+  .edge.res-active{stroke:var(--res); stroke-width:2.6; filter:drop-shadow(0 0 5px rgba(251,191,36,0.55));}
+  .edge.gslb{stroke:var(--gslb); stroke-width:1.6; stroke-dasharray:4 4; opacity:0.35;}
+  .edge.gslb.active{opacity:1; filter:drop-shadow(0 0 5px rgba(244,114,182,0.55));}
+
+  .dot{fill:#fff; filter:drop-shadow(0 0 6px rgba(255,255,255,0.9));}
+
+  .pill{
+    font-family:'JetBrains Mono',monospace; font-size:10px; fill:var(--text-dim);
+  }
+
+  /* Side panel */
+  .side{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px;
+  }
+  .step-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--req);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .step-tag.response{color:var(--res);}
+  .step-title{font-size:18px; font-weight:700; margin-bottom:8px; line-height:1.3;}
+  .step-desc{font-size:14px; color:var(--text-dim); line-height:1.55;}
+
+  .controls{display:flex; gap:8px; margin-top:16px;}
+  button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    background:#16283F; color:var(--text); border:1px solid var(--panel-border);
+    border-radius:6px; padding:9px 14px; cursor:pointer; transition:all 0.15s;
+  }
+  button:hover:not(:disabled){border-color:var(--req); color:var(--req);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--req); color:#08131f; border-color:var(--req); font-weight:700;}
+  button.primary:hover{filter:brightness(1.08);}
+
+  .progress{display:flex; gap:5px; margin-top:14px; flex-wrap:wrap;}
+  .progress span{
+    width:100%; max-width:16px; height:5px; border-radius:3px; background:#233149; cursor:pointer;
+  }
+  .progress span.done{background:var(--req);}
+  .progress span.done.res{background:var(--res);}
+  .progress span.now{outline:2px solid #fff; outline-offset:1px;}
+
+  /* Reverse proxy explainer */
+  .rp-card{border-color:#3a2540;}
+  .rp-card.highlight{border-color:var(--gslb); box-shadow:0 0 0 1px var(--gslb), 0 0 20px rgba(244,114,182,0.15);}
+  .rp-head{display:flex; align-items:center; gap:8px; margin-bottom:10px;}
+  .rp-badge{
+    font-family:'JetBrains Mono',monospace; font-size:10px; background:rgba(244,114,182,0.15);
+    color:var(--gslb); border:1px solid rgba(244,114,182,0.4); padding:3px 8px; border-radius:20px;
+  }
+  .rp-title{font-size:15px; font-weight:700;}
+  .rp-compare{display:grid; grid-template-columns:1fr 1fr; gap:10px; margin-top:12px;}
+  .rp-col{background:#0F1A2B; border:1px solid #26374F; border-radius:8px; padding:10px; font-size:12px;}
+  .rp-col h4{font-size:11px; text-transform:uppercase; letter-spacing:0.05em; color:var(--text-dim); margin-bottom:8px; font-family:'JetBrains Mono',monospace;}
+  .rp-col.bad h4{color:#F87171;}
+  .rp-col.good h4{color:var(--req);}
+  .rp-col p{color:var(--text-dim); line-height:1.5; font-size:12px;}
+  .rp-body p{font-size:13px; color:var(--text-dim); line-height:1.6; margin-top:4px;}
+
+  .legend{display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim); margin-top:12px; font-family:'JetBrains Mono',monospace;}
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · Figure 2-4, corrected</div>
+    <h1>Life of a Request</h1>
+    <p class="sub">Step through what actually happens between a click and a rendered page — including the browser as the real go-between, and the full trip back.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <svg id="diagram" viewBox="0 0 1180 640" xmlns="http://www.w3.org/2000/svg">
+
+        <!-- ===== EDGES (drawn first, under nodes) ===== -->
+        <!-- User <-> Browser -->
+        <path id="e-user-browser" class="edge" d="M 130 355 L 235 355"/>
+        <!-- Browser <-> DNS -->
+        <path id="e-browser-dns" class="edge" d="M 300 330 L 300 175 L 400 175" />
+        <!-- DNS <-> GSLB -->
+        <path id="e-dns-gslb" class="edge gslb" d="M 500 175 L 700 175 L 700 260"/>
+        <!-- Browser <-> GFE -->
+        <path id="e-browser-gfe" class="edge" d="M 340 355 L 460 355"/>
+        <!-- GFE <-> GSLB -->
+        <path id="e-gfe-gslb" class="edge gslb" d="M 620 340 L 660 300"/>
+        <!-- GFE <-> App Frontend -->
+        <path id="e-gfe-frontend" class="edge" d="M 660 340 L 790 260"/>
+        <!-- Frontend <-> GSLB -->
+        <path id="e-frontend-gslb" class="edge gslb" d="M 790 300 L 745 300"/>
+        <!-- Frontend <-> Backend -->
+        <path id="e-frontend-backend" class="edge" d="M 860 300 L 860 380"/>
+        <!-- Backend <-> Bigtable -->
+        <path id="e-backend-bigtable" class="edge" d="M 940 420 L 1040 420"/>
+
+        <!-- ===== NODES ===== -->
+        <g class="node" id="n-user">
+          <rect x="55" y="325" width="70" height="60"/>
+          <text class="label" x="90" y="352" text-anchor="middle">User</text>
+          <text class="sublabel" x="90" y="368" text-anchor="middle">person</text>
+        </g>
+
+        <g class="node" id="n-browser">
+          <rect x="235" y="320" width="105" height="70"/>
+          <text class="label" x="287" y="350" text-anchor="middle">Browser</text>
+          <text class="sublabel" x="287" y="366" text-anchor="middle">the only thing</text>
+          <text class="sublabel" x="287" y="378" text-anchor="middle">the user touches</text>
+        </g>
+
+        <g class="node" id="n-dns">
+          <rect x="400" y="140" width="100" height="70"/>
+          <text class="label" x="450" y="170" text-anchor="middle">Google DNS</text>
+          <text class="sublabel" x="450" y="186" text-anchor="middle">name → IP</text>
+        </g>
+
+        <g class="node" id="n-gslb">
+          <rect x="660" y="260" width="90" height="55"/>
+          <text class="label" x="705" y="285" text-anchor="middle" font-size="12">GSLB</text>
+          <text class="sublabel" x="705" y="300" text-anchor="middle">global load balancer</text>
+        </g>
+
+        <g class="node" id="n-gfe">
+          <rect x="460" y="320" width="110" height="70"/>
+          <text class="label" x="515" y="348" text-anchor="middle">GFE</text>
+          <text class="sublabel" x="515" y="364" text-anchor="middle">reverse proxy</text>
+          <text class="sublabel" x="515" y="378" text-anchor="middle">(Google Front End)</text>
+        </g>
+
+        <g class="node" id="n-frontend">
+          <rect x="790" y="225" width="120" height="70"/>
+          <text class="label" x="850" y="253" text-anchor="middle">App Frontend</text>
+          <text class="sublabel" x="850" y="269" text-anchor="middle">Shakespeare service</text>
+          <text class="sublabel" x="850" y="281" text-anchor="middle">builds protobuf</text>
+        </g>
+
+        <g class="node" id="n-backend">
+          <rect x="800" y="380" width="120" height="70"/>
+          <text class="label" x="860" y="410" text-anchor="middle">App Backend</text>
+          <text class="sublabel" x="860" y="426" text-anchor="middle">Shakespeare service</text>
+          <text class="sublabel" x="860" y="438" text-anchor="middle">runs the lookup</text>
+        </g>
+
+        <g class="node" id="n-bigtable">
+          <rect x="1040" y="390" width="110" height="60"/>
+          <text class="label" x="1095" y="415" text-anchor="middle" font-size="13">Bigtable</text>
+          <text class="sublabel" x="1095" y="431" text-anchor="middle">word index</text>
+        </g>
+
+        <!-- moving dot -->
+        <circle id="dot" class="dot" r="5" cx="-50" cy="-50"/>
+      </svg>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="step-tag" id="stepTag">Request · Step 1 of 13</div>
+        <div class="step-title" id="stepTitle">Type the address</div>
+        <div class="step-desc" id="stepDesc">The user navigates to shakespeare.google.com. Everything from here happens inside the browser and the systems behind it — the user never talks to any of them directly.</div>
+
+        <div class="progress" id="progress"></div>
+
+        <div class="controls">
+          <button id="prevBtn">← Back</button>
+          <button id="nextBtn" class="primary">Next →</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+
+        <div class="legend">
+          <span><i class="swatch" style="background:var(--req)"></i>Request path</span>
+          <span><i class="swatch" style="background:var(--res)"></i>Response path</span>
+          <span><i class="swatch" style="background:var(--gslb)"></i>GSLB lookup</span>
+        </div>
+      </div>
+
+      <div class="card rp-card" id="rpCard">
+        <div class="rp-head">
+          <span class="rp-badge">CONCEPT</span>
+          <span class="rp-title">What's a reverse proxy?</span>
+        </div>
+        <div class="rp-body">
+          <p>A normal proxy sits in front of <em>clients</em> and hides them from the internet. A <strong>reverse proxy</strong> does the opposite: it sits in front of <em>servers</em> and hides them from clients.</p>
+          <p>The GFE is Google's reverse proxy. Your browser's TCP connection ends at the GFE — it never reaches the Shakespeare frontend, backend, or Bigtable directly.</p>
+        </div>
+        <div class="rp-compare">
+          <div class="rp-col bad">
+            <h4>Without one</h4>
+            <p>Browser needs the real IP of a live backend, handles TLS itself, and breaks if that exact server goes down.</p>
+          </div>
+          <div class="rp-col good">
+            <h4>With the GFE</h4>
+            <p>Browser only ever knows one address. GFE handles TLS, picks a healthy backend via GSLB, and can swap servers freely.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Redrawn from Figure 2-4 in the <em>Google SRE Workbook</em> (O'Reilly), corrected to route through the browser and show the response path.</footer>
+</div>
+
+<script>
+const nodePositions = {
+  user:{x:90, y:355}, browser:{x:287,y:355}, dns:{x:450,y:175}, gslb:{x:705,y:288},
+  gfe:{x:515,y:355}, frontend:{x:850,y:260}, backend:{x:860,y:415}, bigtable:{x:1095,y:420}
+};
+
+// Each step: nodes to activate, edges (id, class req/res), gslb edge id if any, and text
+const steps = [
+  {
+    phase:'req', title:'Type the address',
+    desc:"The user navigates to shakespeare.google.com. Everything from here happens inside the browser and the systems behind it — the user never talks to any of them directly.",
+    nodes:['user','browser'], edge:{id:'e-user-browser', cls:'req-active', from:'user', to:'browser'}
+  },
+  {
+    phase:'req', title:'Browser resolves the name',
+    desc:"The browser — not the user — asks a Google DNS server to translate the domain into an IP address.",
+    nodes:['browser','dns'], edge:{id:'e-browser-dns', cls:'req-active', from:'browser', to:'dns'}
+  },
+  {
+    phase:'req', title:'DNS checks with GSLB',
+    desc:"The DNS server consults GSLB, which tracks load across regions and decides which frontend IP is best for this user.",
+    nodes:['dns','gslb'], edge:{id:'e-dns-gslb', cls:'gslb active', from:'dns', to:'gslb'}
+  },
+  {
+    phase:'res', title:'DNS hands back an IP',
+    desc:"That IP address travels back to the browser — the first return trip. The browser still hasn't connected to anything yet.",
+    nodes:['dns','browser'], edge:{id:'e-browser-dns', cls:'res-active', from:'dns', to:'browser'}
+  },
+  {
+    phase:'req', title:'Browser connects to the GFE',
+    desc:"Using that IP, the browser opens a TCP connection — directly and only — to a Google Front End (GFE). This is the one and only server address the browser ever knows about.",
+    nodes:['browser','gfe'], edge:{id:'e-browser-gfe', cls:'req-active', from:'browser', to:'gfe'},
+    rp:true
+  },
+  {
+    phase:'req', title:'GFE terminates the connection',
+    desc:"This is the reverse proxy in action: the GFE ends the browser's TCP connection right here. As far as the browser is concerned, the GFE is the entire service. The GFE now checks GSLB for a healthy Shakespeare frontend.",
+    nodes:['gfe','gslb'], edge:{id:'e-gfe-gslb', cls:'gslb active', from:'gfe', to:'gslb'},
+    rp:true
+  },
+  {
+    phase:'req', title:'GFE forwards an RPC',
+    desc:"The GFE repackages the browser's HTTP request as an internal RPC and sends it on to an Application Frontend server it picked via GSLB.",
+    nodes:['gfe','frontend'], edge:{id:'e-gfe-frontend', cls:'req-active', from:'gfe', to:'frontend'},
+    rp:true
+  },
+  {
+    phase:'req', title:'Frontend builds a protobuf',
+    desc:"The frontend parses the HTML request and builds a protobuf message containing the word to look up.",
+    nodes:['frontend']
+  },
+  {
+    phase:'req', title:'Frontend finds a backend',
+    desc:"The frontend asks GSLB for the address of a suitable, unloaded Shakespeare backend server.",
+    nodes:['frontend','gslb'], edge:{id:'e-frontend-gslb', cls:'gslb active', from:'frontend', to:'gslb'}
+  },
+  {
+    phase:'req', title:'Frontend calls the backend',
+    desc:"An RPC carrying that protobuf goes from the frontend to the chosen backend server.",
+    nodes:['frontend','backend'], edge:{id:'e-frontend-backend', cls:'req-active', from:'frontend', to:'backend'}
+  },
+  {
+    phase:'req', title:'Backend queries Bigtable',
+    desc:"The backend contacts a Bigtable server to fetch the actual index data for that word.",
+    nodes:['backend','bigtable'], edge:{id:'e-backend-bigtable', cls:'req-active', from:'backend', to:'bigtable'}
+  },
+  {
+    phase:'res', title:'Results flow back up',
+    desc:"Bigtable's answer is written into a reply protobuf and passed back: Bigtable → backend → frontend, which assembles the final HTML, then on to the GFE.",
+    nodes:['bigtable','backend','frontend','gfe'],
+    multiEdge:[
+      {id:'e-backend-bigtable', cls:'res-active'},
+      {id:'e-frontend-backend', cls:'res-active'},
+      {id:'e-gfe-frontend', cls:'res-active'}
+    ]
+  },
+  {
+    phase:'res', title:'GFE answers the browser, browser renders for the user',
+    desc:"The GFE sends the HTTP response back over the same connection the browser opened. The browser renders the page — this is the step the original diagram leaves out entirely.",
+    nodes:['gfe','browser','user'],
+    multiEdge:[
+      {id:'e-browser-gfe', cls:'res-active'},
+      {id:'e-user-browser', cls:'res-active'}
+    ]
+  }
+];
+
+let current = 0;
+let playing = false;
+let playTimer = null;
+
+const svg = document.getElementById('diagram');
+const allEdgeEls = {};
+['e-user-browser','e-browser-dns','e-dns-gslb','e-browser-gfe','e-gfe-gslb','e-gfe-frontend','e-frontend-gslb','e-frontend-backend','e-backend-bigtable'].forEach(id=>{
+  allEdgeEls[id] = document.getElementById(id);
+});
+const allNodeEls = {};
+['user','browser','dns','gslb','gfe','frontend','backend','bigtable'].forEach(id=>{
+  allNodeEls[id] = document.getElementById('n-'+id);
+});
+const dot = document.getElementById('dot');
+const progressEl = document.getElementById('progress');
+const rpCard = document.getElementById('rpCard');
+
+// build progress dots
+steps.forEach((s,i)=>{
+  const d = document.createElement('span');
+  d.dataset.i = i;
+  d.addEventListener('click', ()=> goTo(i));
+  progressEl.appendChild(d);
+});
+
+function resetVisual(){
+  Object.values(allEdgeEls).forEach(el=>{
+    el.classList.remove('req-active','res-active','active');
+  });
+  Object.values(allNodeEls).forEach(el=> el.classList.remove('active','resActive'));
+  dot.setAttribute('cx', -50);
+  dot.setAttribute('cy', -50);
+}
+
+function animateDotAlong(pathEl, reverse, cls){
+  const len = pathEl.getTotalLength();
+  const duration = 700;
+  const start = performance.now();
+  function frame(now){
+    let t = Math.min(1, (now-start)/duration);
+    let dist = reverse ? len*(1-t) : len*t;
+    const pt = pathEl.getPointAtLength(dist);
+    dot.setAttribute('cx', pt.x);
+    dot.setAttribute('cy', pt.y);
+    dot.style.fill = cls.includes('res') ? 'var(--res)' : (cls.includes('gslb') ? 'var(--gslb)' : 'var(--req)');
+    if(t<1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+function render(){
+  resetVisual();
+  const s = steps[current];
+
+  s.nodes.forEach(n=>{
+    allNodeEls[n].classList.add('active');
+    if(s.phase==='res') allNodeEls[n].classList.add('resActive');
+  });
+
+  if(s.edge){
+    const el = allEdgeEls[s.edge.id];
+    el.classList.add(...s.edge.cls.split(' '));
+    animateDotAlong(el, s.phase==='res', s.edge.cls);
+  }
+  if(s.multiEdge){
+    s.multiEdge.forEach(e=>{
+      allEdgeEls[e.id].classList.add(...e.cls.split(' '));
+    });
+  }
+
+  document.getElementById('stepTag').textContent = (s.phase==='res' ? 'Response' : 'Request') + ' · Step ' + (current+1) + ' of ' + steps.length;
+  document.getElementById('stepTag').className = 'step-tag' + (s.phase==='res' ? ' response' : '');
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').textContent = s.desc;
+
+  rpCard.classList.toggle('highlight', !!s.rp);
+
+  [...progressEl.children].forEach((d,i)=>{
+    d.classList.toggle('now', i===current);
+    d.classList.toggle('done', i<=current);
+    d.classList.toggle('res', steps[i].phase==='res');
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===steps.length-1;
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(steps.length-1, i));
+  render();
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playing){
+    playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+    return;
+  }
+  playing=true; playBtn.textContent='⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(current>=steps.length-1){
+      playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+      return;
+    }
+    goTo(current+1);
+  }, 1900);
+});
+
+render();
+</script>
+</body>
+</html>

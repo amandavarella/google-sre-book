@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Google SRE Book — Learning Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Notes and interactive diagrams from working through Google's Site Reliability Engineering book.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --accent:#5EEAD4;
+    --accent-2:#FBBF24;
+    --pink:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter',sans-serif;
+    min-height:100vh;
+    padding:48px 20px 80px;
+    line-height:1.5;
+  }
+  .wrap{max-width:940px; margin:0 auto;}
+
+  .eyebrow{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.14em;
+    text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+  }
+  h1{
+    font-family:'JetBrains Mono',monospace; font-weight:700;
+    font-size:clamp(28px,5vw,42px); letter-spacing:-0.02em; line-height:1.15;
+  }
+  .lede{color:var(--text-dim); font-size:15px; margin-top:12px; max-width:620px;}
+  .lede a{color:var(--accent); text-decoration:none; border-bottom:1px solid rgba(94,234,212,0.35);}
+  .lede a:hover{border-bottom-color:var(--accent);}
+
+  h2{
+    font-family:'JetBrains Mono',monospace; font-size:13px; letter-spacing:0.12em;
+    text-transform:uppercase; color:var(--text-dim); font-weight:500;
+    margin:52px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--panel-border);
+  }
+
+  /* featured diagrams */
+  .feature-grid{display:grid; grid-template-columns:1fr; gap:14px;}
+  @media(min-width:720px){ .feature-grid{grid-template-columns:1fr 1fr;} }
+  .feature{
+    display:block; text-decoration:none; color:inherit;
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:20px; transition:border-color .15s, transform .15s, box-shadow .15s;
+  }
+  .feature:hover{
+    border-color:var(--accent); transform:translateY(-2px);
+    box-shadow:0 6px 24px rgba(94,234,212,0.10);
+  }
+  .feature .tag{
+    font-family:'JetBrains Mono',monospace; font-size:10px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--pink); margin-bottom:10px; display:block;
+  }
+  .feature h3{font-size:19px; font-weight:700; margin-bottom:8px; letter-spacing:-0.01em;}
+  .feature p{font-size:13px; color:var(--text-dim); line-height:1.55;}
+  .feature .go{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent);
+    margin-top:14px; display:inline-block;
+  }
+
+  /* chapter index */
+  .part{
+    font-family:'JetBrains Mono',monospace; font-size:11px; letter-spacing:0.1em;
+    text-transform:uppercase; color:var(--accent-2); margin:28px 0 10px;
+  }
+  .part:first-of-type{margin-top:0;}
+  ol.chapters{list-style:none;}
+  ol.chapters li{border-bottom:1px solid rgba(38,55,79,0.6);}
+  ol.chapters a{
+    display:flex; align-items:baseline; gap:14px; text-decoration:none; color:var(--text);
+    padding:11px 10px; border-radius:6px; transition:background .12s, color .12s;
+  }
+  ol.chapters a:hover{background:rgba(94,234,212,0.05); color:var(--accent);}
+  .num{
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim);
+    min-width:26px; flex-shrink:0;
+  }
+  ol.chapters a:hover .num{color:var(--accent);}
+  .title{font-size:14px; flex:1;}
+  .badge{
+    font-family:'JetBrains Mono',monospace; font-size:9px; letter-spacing:0.08em;
+    background:rgba(244,114,182,0.14); color:var(--pink);
+    border:1px solid rgba(244,114,182,0.35); padding:3px 8px; border-radius:20px;
+    flex-shrink:0; white-space:nowrap;
+  }
+
+  footer{
+    margin-top:60px; padding-top:22px; border-top:1px solid var(--panel-border);
+    font-size:12px; color:var(--text-dim); text-align:center; line-height:1.7;
+  }
+  footer a{color:var(--accent); text-decoration:none;}
+  footer a:hover{text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Learning notes</div>
+    <h1>Google SRE Book</h1>
+    <p class="lede">
+      Notes, takeaways and interactive diagrams from working through
+      <a href="https://sre.google/sre-book/table-of-contents/">Site Reliability Engineering</a>
+      (Beyer, Jones, Petoff &amp; Murphy — O'Reilly, 2016). Every diagram is a single
+      self-contained page you can step through.
+    </p>
+  </header>
+
+  <h2>Interactive diagrams</h2>
+  <div class="feature-grid">
+    <a class="feature" href="chapters/ch02-production-environment/diagrams/life-of-a-request.html">
+      <span class="tag">Chapter 2</span>
+      <h3>Life of a Request</h3>
+      <p>Step through a Shakespeare search from the click to the rendered page — including the browser as the real go-between, and the full trip back.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+  </div>
+
+  <h2>Chapters</h2>
+  <div class="part">Part I. Introduction</div>
+  <ol class="chapters">
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch01-introduction/README.md">
+      <span class="num">01</span>
+      <span class="title">Introduction</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch02-production-environment/README.md">
+      <span class="num">02</span>
+      <span class="title">The Production Environment at Google, from the Viewpoint of an SRE</span>
+      <span class="badge">1 diagram</span>
+    </a></li>
+  </ol>
+  <div class="part">Part II. Principles</div>
+  <ol class="chapters">
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch03-embracing-risk/README.md">
+      <span class="num">03</span>
+      <span class="title">Embracing Risk</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch04-service-level-objectives/README.md">
+      <span class="num">04</span>
+      <span class="title">Service Level Objectives</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch05-eliminating-toil/README.md">
+      <span class="num">05</span>
+      <span class="title">Eliminating Toil</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch06-monitoring-distributed-systems/README.md">
+      <span class="num">06</span>
+      <span class="title">Monitoring Distributed Systems</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch07-evolution-of-automation/README.md">
+      <span class="num">07</span>
+      <span class="title">The Evolution of Automation at Google</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch08-release-engineering/README.md">
+      <span class="num">08</span>
+      <span class="title">Release Engineering</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch09-simplicity/README.md">
+      <span class="num">09</span>
+      <span class="title">Simplicity</span>
+    </a></li>
+  </ol>
+  <div class="part">Part III. Practices</div>
+  <ol class="chapters">
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch10-practical-alerting/README.md">
+      <span class="num">10</span>
+      <span class="title">Practical Alerting from Time-Series Data</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch11-being-on-call/README.md">
+      <span class="num">11</span>
+      <span class="title">Being On-Call</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch12-effective-troubleshooting/README.md">
+      <span class="num">12</span>
+      <span class="title">Effective Troubleshooting</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch13-emergency-response/README.md">
+      <span class="num">13</span>
+      <span class="title">Emergency Response</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch14-managing-incidents/README.md">
+      <span class="num">14</span>
+      <span class="title">Managing Incidents</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch15-postmortem-culture/README.md">
+      <span class="num">15</span>
+      <span class="title">Postmortem Culture: Learning from Failure</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch16-tracking-outages/README.md">
+      <span class="num">16</span>
+      <span class="title">Tracking Outages</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch17-testing-for-reliability/README.md">
+      <span class="num">17</span>
+      <span class="title">Testing for Reliability</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch18-software-engineering-in-sre/README.md">
+      <span class="num">18</span>
+      <span class="title">Software Engineering in SRE</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch19-load-balancing-frontend/README.md">
+      <span class="num">19</span>
+      <span class="title">Load Balancing at the Frontend</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch20-load-balancing-datacenter/README.md">
+      <span class="num">20</span>
+      <span class="title">Load Balancing in the Datacenter</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch21-handling-overload/README.md">
+      <span class="num">21</span>
+      <span class="title">Handling Overload</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch22-cascading-failures/README.md">
+      <span class="num">22</span>
+      <span class="title">Addressing Cascading Failures</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch23-distributed-consensus/README.md">
+      <span class="num">23</span>
+      <span class="title">Managing Critical State: Distributed Consensus for Reliability</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch24-distributed-cron/README.md">
+      <span class="num">24</span>
+      <span class="title">Distributed Periodic Scheduling with Cron</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch25-data-processing-pipelines/README.md">
+      <span class="num">25</span>
+      <span class="title">Data Processing Pipelines</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch26-data-integrity/README.md">
+      <span class="num">26</span>
+      <span class="title">Data Integrity: What You Read Is What You Write</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch27-reliable-product-launches/README.md">
+      <span class="num">27</span>
+      <span class="title">Reliable Product Launches at Scale</span>
+    </a></li>
+  </ol>
+  <div class="part">Part IV. Management</div>
+  <ol class="chapters">
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch28-accelerating-sres/README.md">
+      <span class="num">28</span>
+      <span class="title">Accelerating SREs to On-Call and Beyond</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch29-dealing-with-interrupts/README.md">
+      <span class="num">29</span>
+      <span class="title">Dealing with Interrupts</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch30-embedding-an-sre/README.md">
+      <span class="num">30</span>
+      <span class="title">Embedding an SRE to Recover from Operational Overload</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch31-communication-collaboration/README.md">
+      <span class="num">31</span>
+      <span class="title">Communication and Collaboration in SRE</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch32-sre-engagement-model/README.md">
+      <span class="num">32</span>
+      <span class="title">The Evolving SRE Engagement Model</span>
+    </a></li>
+  </ol>
+  <div class="part">Part V. Conclusions</div>
+  <ol class="chapters">
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch33-lessons-from-other-industries/README.md">
+      <span class="num">33</span>
+      <span class="title">Lessons Learned from Other Industries</span>
+    </a></li>
+    <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch34-conclusion/README.md">
+      <span class="num">34</span>
+      <span class="title">Conclusion</span>
+    </a></li>
+  </ol>
+
+  <footer>
+    Notes and redrawn diagrams by <a href="https://github.com/amandavarella">Amanda Varella</a> ·
+    <a href="https://github.com/amandavarella/google-sre-book">Source on GitHub</a><br>
+    The book itself is free to read at <a href="https://sre.google/sre-book/table-of-contents/">sre.google</a>.
+    No book text is reproduced here.
+  </footer>
+</div>
+</body>
+</html>
