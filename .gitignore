@@ -3,6 +3,7 @@
 .idea/
 *.swp
 
-# Personal, machine-local Claude Code context and settings
+# Personal, machine-local agent context and settings
+AGENTS.local.md
 CLAUDE.local.md
 .claude/settings.local.json

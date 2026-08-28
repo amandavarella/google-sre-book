@@ -10,6 +10,7 @@ My notes, takeaways and **interactive diagrams** while working through
 ```
 README.md                         you are here
 index.html                        GitHub Pages landing page
+AGENTS.md                         conventions for agents working in this repo
 chapters/
   chNN-slug/
     README.md                     notes for that chapter
