@@ -407,14 +407,27 @@ promises:
   Users do not meet the fast 1%. They meet the slow 90. The product feels slow to everyone,
   not only to the tail. One SLO at 100 ms cannot see this, because both the 85 ms clicks and
   the 99 ms click still pass.
-- **A batch report.** Users will wait seconds. You care that almost nothing exceeds a deadline
-  (p99 / p99.9). Pinning p90 to 1 ms would waste money on hardware nobody can feel.
+- **A batch report.** Users will wait seconds for a nightly PDF. They do not need 90 of 100
+  reports in 1 ms. They need the report to arrive before the morning meeting. So you watch the
+  far tail: how late is the slow one?
+
+  **What `p99` and `p99.9` mean.** The number after `p` is a percent. `p99` is the time that
+  99 of 100 jobs beat (1 in 100 is slower). `p99.9` is the time that 999 of 1,000 jobs beat
+  (1 in 1,000 is slower). The slash in `p99 / p99.9` was only "or": pick p99, or pick the even
+  rarer p99.9 if one late job in a thousand is still too many.
+
+  Example: 1,000 reports must be in inboxes by 08:00. 999 finish by 07:50. One finishes at
+  10:00. p99 is still about 07:50 (only 1 in 100 is allowed to be later, and you have only 1
+  late job in 1,000). p99.9 is 10:00: that is the one job that missed the meeting. If "almost
+  nothing may be late" is the promise, p99.9 is the number you set a deadline on. Spending
+  money to make p90 = 1 ms would make the typical report faster in a way nobody in the room
+  can feel.
 - **Two user populations.** Mobile clients on slow networks vs an internal admin tool on the
   same API. One 100 ms SLO is a compromise that fits neither. Two targets (or two SLOs) make
   the two humps visible.
 - **A regression that "still passes."** Engineers add work to the common path. p90 moves from
-  1 ms to 80 ms. p99 stays under 100 ms. A single SLO stays green. Three targets would fail
-  the 90% / 1 ms line and page you.
+  1 ms to 80 ms. p99 stays under 100 ms. A single SLO stays green. A stack of targets would
+  fail the line "90% of requests finish in under 1 ms" and page you.
 
 That is why the book offers a *stack* of SLOs when shape matters:
 
