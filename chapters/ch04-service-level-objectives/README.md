@@ -762,10 +762,42 @@ keep adding servers. You form a new hypothesis.
 
 **Without the SLO you would not know whether to act, or when**
 
-The SLI alone can go 28 ms → 38 ms → 45 ms. That is "a bit slower." Is 45 ms a fire?
-Only the mark answers. If the SLO is 50 ms, 17:00 is the deadline and you act at 15:00.
-If the SLO is 200 ms, 45 ms is still fine and you do not spend the afternoon adding
-servers. Same SLI path. Different action. The SLO picked *whether* and *when*.
+Start with only the SLI. No mark on the ruler. The dashboard says:
+
+| Time | p99 (the time 99 of 100 clicks finish in or less) |
+|---|---|
+| 11:00 | 28 ms |
+| 13:00 | 38 ms |
+| 15:00 | 45 ms |
+
+That is a rise. It is not a miss. A miss needs a promise. "A bit slower" is all you can
+say. Is 45 ms a fire? The graph cannot answer. Two people can argue all afternoon.
+
+**Whether** means: do we add servers *today at all*?  
+**When** means: if we add them, do we add them at 15:00 (while there is still room), or
+only after users are already over the mark?
+
+Those two questions stay open until someone writes the SLO. The same three readings then
+split into two afternoons.
+
+| | Team A wrote `99% under 50 ms` | Team B wrote `99% under 200 ms` |
+|---|---|---|
+| 15:00 reading | 45 ms. Only 5 ms left to the mark. | 45 ms. 155 ms left to the mark. |
+| If the rise holds | Hits 50 ms around 17:00. That is a miss. | Hits 50 ms around 17:00 too, but 50 ms is not their mark. They still have room until ~200 ms. |
+| Whether to act | Yes. Add servers today. | No. Do not spend the afternoon adding servers. |
+| When to act | At 15:00, *before* 17:00. After 17:00 the promise is already broken. | Not today. Watch the graph tomorrow. |
+
+Why 17:00? From 11:00 to 15:00 the reading rose about 17 ms in four hours (28 → 45).
+That is roughly 4 ms per hour. 45 + 8 ms more (two hours) is about 53 ms. So if nothing
+changes, Team A crosses 50 ms around 17:00. Team B's 200 ms mark is still far away on
+that slope.
+
+Same SLI path. Different action. The SLO is what turned "a bit slower" into either "act
+at 15:00" or "do not act today."
+
+If *neither* team wrote an SLO, you are stuck at the argument. Some people add servers
+(maybe wasted work). Some people wait (maybe a real miss of a promise nobody wrote). The
+control loop has no step 2.
 
 The Friday filter meeting is the same loop, just slower: measure (20 ms), compare
 (20 + 80 = 100, mark is 50), decide (wait), act (cut the extra 80 ms). Daily error-budget
@@ -858,8 +890,9 @@ See
   green.
 - SLIs and SLOs run a control loop: measure the SLI, compare it to the SLO, decide what
   would meet the mark, act, measure again. Without the SLO you can see latency rise and
-  still not know whether to act, or when. Same 28 ms → 45 ms path is a fire at a 50 ms
-  mark and a shrug at a 200 ms mark.
+  still not know whether to act (add servers today at all), or when (at 15:00, before
+  the miss). Same 28 ms → 45 ms path is "act at 15:00" at a 50 ms mark and "do not act
+  today" at a 200 ms mark.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
