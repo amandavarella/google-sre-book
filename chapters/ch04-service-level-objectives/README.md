@@ -722,6 +722,58 @@ See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>
 (last step).
 
+#### Control Measures
+
+SLIs and SLOs are the two numbers in a **control loop**: a cycle you repeat to steer the
+system. Think of a thermostat. The room temperature is the SLI (what you read). The
+setpoint is the SLO (what you promised). If the reading is heading past the mark, you
+act. Then you read again.
+
+The four steps:
+
+1. **Measure the SLI.** Watch the ruler. Example: time for 99 of 100 clicks to finish
+   (p99).
+2. **Compare the SLI to the SLO.** Decide if action is needed. The mark is `99 of 100
+   clicks finish in 50 ms or less`. 28 ms is fine. 48 ms and still rising is not.
+3. **If action is needed, find what would meet the target.** This is a hypothesis, then
+   a test. Not a guess you ship blindly.
+4. **Take that action.** Then go back to step 1. The loop does not end.
+
+**Worked afternoon**
+
+SLO: `99 of 100 clicks finish in 50 ms or less`.
+
+| Time | SLI (p99) | Compared to 50 ms |
+|---|---|---|
+| 11:00 | 28 ms | Fine. Room to spare. |
+| 13:00 | 38 ms | Still under. Rising. |
+| 15:00 | 45 ms | Close. If the rise holds, you miss around 17:00. |
+
+Step 2 says: act now, or the promise misses in a few hours.
+
+Step 3: test "the servers are **CPU-bound**." CPU-bound means the processor is the
+bottleneck. Each machine's CPU is full. New clicks wait in line for a core. You check
+CPU graphs. If they sit near 100%, the hypothesis holds. The action is add more
+servers, so the line of clicks is split across more CPUs.
+
+Step 4: add the servers. Measure again. If p99 falls to 32 ms, the loop worked. If it
+does not, the hypothesis was wrong (maybe a lock, maybe a slow dependency). You do not
+keep adding servers. You form a new hypothesis.
+
+**Without the SLO you would not know whether to act, or when**
+
+The SLI alone can go 28 ms → 38 ms → 45 ms. That is "a bit slower." Is 45 ms a fire?
+Only the mark answers. If the SLO is 50 ms, 17:00 is the deadline and you act at 15:00.
+If the SLO is 200 ms, 45 ms is still fine and you do not spend the afternoon adding
+servers. Same SLI path. Different action. The SLO picked *whether* and *when*.
+
+The Friday filter meeting is the same loop, just slower: measure (20 ms), compare
+(20 + 80 = 100, mark is 50), decide (wait), act (cut the extra 80 ms). Daily error-budget
+tracking is the same loop on the miss-rate SLI.
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Control loop</a>.
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -756,6 +808,10 @@ See
   an SLO. It has no shared number. A good SLO is a forcing function: it picks ship or wait
   when people disagree. Too tight wastes heroic work. Too loose lets a slow product stay
   green.
+- SLIs and SLOs run a control loop: measure the SLI, compare it to the SLO, decide what
+  would meet the mark, act, measure again. Without the SLO you can see latency rise and
+  still not know whether to act, or when. Same 28 ms → 45 ms path is a fire at a 50 ms
+  mark and a shrug at a 200 ms mark.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -787,6 +843,7 @@ See
 | **Two workload classes**: same `Set` RPC; pipeline 95% under 1 s, small clicks 99% under 10 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Error budget**: 99.9% succeed means 1 of 1,000 may fail; that leftover is the spend you track | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that change ship or wait; last step is the lever (too tight, just enough, too loose) | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Control loop**: measure the SLI, compare to the SLO, find an action, act; without the mark, 28 ms → 45 ms has no deadline | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
