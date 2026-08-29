@@ -897,6 +897,35 @@ Users depend on what they actually get, not the written SLO. If you run much bet
 you advertised, they treat that as the real promise, which is why Chubby takes planned
 outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outage-case-study) above).
 
+**The SLO decides where the next week of people goes**
+
+"How well is the system meeting its expectations?" means: compare the SLI to the SLO
+(and look at error-budget left). That answer picks the next pile of work. It is the
+control loop's step 2, used on a planning calendar, not only on a Tuesday afternoon.
+
+**Not fine** (internal SLO red, or the week's error budget almost gone): put people on
+the service itself.
+
+- **Faster:** cut latency (the extra 80 ms on the filter, add servers when p99 is heading
+  at 50 ms).
+- **More available:** raise the share of requests that succeed.
+- **More resilient:** recover when something breaks (retries, a fallback, a second
+  region), so one failure does not take the whole promise with it.
+
+**Fine** (internal SLO green, advertised green, budget left): do *not* spend the week
+making 28 ms into 20 ms. Users already have the promise. Put people on other work.
+
+- **Technical debt:** a shortcut you took that makes the next change harder (a manual
+  night restart, a module nobody wants to touch). Pay it down while the SLO is green.
+- **New features,** or another product.
+
+Same rule as the error budget: leftover allowance is permission to ship. A spent
+allowance is permission to stop shipping and fix the service. The Friday meeting was
+one decision. This is that decision for the whole roadmap.
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">Invest where</a>.
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -953,6 +982,10 @@ outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outag
   Keep a tighter internal SLO than the one you advertise, so you can act before users see
   a miss. Do not run far better than you advertised: users will depend on the extra
   (Chubby planned outages).
+- The SLO picks the next week of people. Internal red or budget almost gone: invest in
+  faster, more available, or more resilient. Green and budget left: pay down technical
+  debt, ship features, or start another product. Do not spend a green week shaving 28 ms
+  to 20 ms.
 - SLA is an SLO plus a consequence for missing it. SRE doesn't own SLAs (they're a business
   decision), but does own keeping the service inside them and defining the SLIs they're measured
   against. Even without a formal SLA, unavailability still has real consequences (reputation,
@@ -974,6 +1007,7 @@ outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outag
 | **Control loop**: measure the SLI, compare to the SLO, find an action, act; without the mark, 28 ms → 45 ms has no deadline | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **SLOs set expectations**: same offer (cheap, keep the file, sometimes down); photo app says no, archive says yes | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Safety margin**: advertised 100 ms, internal 80 ms; you act in the 20 ms gap before users see a miss | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Invest where**: SLO red or budget gone, fix the service; green and budget left, features and debt | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 

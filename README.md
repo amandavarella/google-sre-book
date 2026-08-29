@@ -27,7 +27,7 @@ or viewed live on GitHub Pages.
 | 1 | [Introduction](https://sre.google/sre-book/introduction/) | [notes](chapters/ch01-introduction/README.md) | — |
 | 2 | [The Production Environment at Google, from the Viewpoint of an SRE](https://sre.google/sre-book/production-environment/) | [notes](chapters/ch02-production-environment/README.md) | 1 |
 | 3 | [Embracing Risk](https://sre.google/sre-book/embracing-risk/) | [notes](chapters/ch03-embracing-risk/README.md) | — |
-| 4 | [Service Level Objectives](https://sre.google/sre-book/service-level-objectives/) | [notes](chapters/ch04-service-level-objectives/README.md) | 10 |
+| 4 | [Service Level Objectives](https://sre.google/sre-book/service-level-objectives/) | [notes](chapters/ch04-service-level-objectives/README.md) | 11 |
 | 5 | [Eliminating Toil](https://sre.google/sre-book/eliminating-toil/) | [notes](chapters/ch05-eliminating-toil/README.md) | — |
 | 6 | [Monitoring Distributed Systems](https://sre.google/sre-book/monitoring-distributed-systems/) | [notes](chapters/ch06-monitoring-distributed-systems/README.md) | — |
 | 7 | [The Evolution of Automation at Google](https://sre.google/sre-book/automation-at-google/) | [notes](chapters/ch07-evolution-of-automation/README.md) | — |
@@ -77,6 +77,7 @@ Parts follow the book: **I. Introduction** (1–2) · **II. Principles** (3–9)
 | 4 | Control loop | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">open</a> |
 | 4 | SLOs set expectations | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">open</a> |
 | 4 | Safety margin | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">open</a> |
+| 4 | Invest where | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">open</a> |
 
 ## Running locally
 

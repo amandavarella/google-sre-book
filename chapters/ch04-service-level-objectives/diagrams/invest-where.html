@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Invest where</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:720px; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px; align-items:start;}
+  @media(min-width:1100px){ .layout{grid-template-columns: 2.4fr 1fr;} }
+
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:14px; overflow:hidden;
+  }
+  svg{width:100%; height:auto; display:block;}
+
+  .layer{opacity:0; pointer-events:none; transition:opacity 0.35s ease;}
+  .layer.on{opacity:1; pointer-events:auto;}
+
+  .side{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px;
+  }
+  .step-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--req);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .step-title{font-size:18px; font-weight:700; margin-bottom:8px; line-height:1.3;}
+  .step-desc{font-size:14px; color:var(--text-dim); line-height:1.55;}
+
+  .controls{display:flex; gap:8px; margin-top:16px;}
+  button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    background:#16283F; color:var(--text); border:1px solid var(--panel-border);
+    border-radius:6px; padding:9px 14px; cursor:pointer; transition:all 0.15s;
+  }
+  button:hover:not(:disabled){border-color:var(--req); color:var(--req);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--req); color:#08131f; border-color:var(--req); font-weight:700;}
+  button.primary:hover{filter:brightness(1.08);}
+
+  .progress{display:flex; gap:5px; margin-top:14px; flex-wrap:wrap;}
+  .progress span{
+    width:100%; max-width:16px; height:5px; border-radius:3px; background:#233149; cursor:pointer;
+  }
+  .progress span.done{background:var(--req);}
+  .progress span.now{outline:2px solid #fff; outline-offset:1px;}
+
+  .legend{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:12px; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · SLOs set expectations</div>
+    <h1>Invest where</h1>
+    <p class="sub">Compare the SLI to the SLO. That answer picks the next week of people. Red or budget almost gone: fix the service. Green and budget left: features and debt, not 28 ms to 20 ms.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <svg viewBox="0 0 1100 480" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="iw-title iw-desc">
+        <title id="iw-title">Invest where</title>
+        <desc id="iw-desc">A weekly check of SLI versus SLO. If the internal mark is red or the error budget is almost gone, invest in faster, more available, more resilient. If green and budget remains, invest in technical debt, features, or another product.</desc>
+
+        <g id="ask" class="layer">
+          <rect x="180" y="80" width="740" height="200" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="550" y="130" fill="#5EEAD4" font-size="15" font-family="'JetBrains Mono', monospace" text-anchor="middle">WEEKLY CHECK</text>
+          <text x="550" y="180" fill="#E7EDF6" font-size="20" font-family="'Inter', sans-serif" text-anchor="middle">Is the SLI still inside the SLO?</text>
+          <text x="550" y="220" fill="#8FA1BC" font-size="16" font-family="'Inter', sans-serif" text-anchor="middle">And how much error budget is left?</text>
+        </g>
+
+        <g id="paths" class="layer">
+          <rect x="40" y="40" width="480" height="400" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="60" y="80" fill="#F472B6" font-size="15" font-family="'JetBrains Mono', monospace">NOT FINE</text>
+          <text x="60" y="114" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Internal SLO red, or the week's</text>
+          <text x="60" y="138" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">error budget almost gone.</text>
+          <text x="60" y="180" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">INVEST IN THE SERVICE</text>
+          <text x="60" y="216" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Faster: cut latency (the extra 80 ms,</text>
+          <text x="60" y="240" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">or add servers before 17:00).</text>
+          <text x="60" y="276" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">More available: more requests succeed.</text>
+          <text x="60" y="312" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">More resilient: recover when something</text>
+          <text x="60" y="336" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">breaks (retries, a fallback, a second region).</text>
+          <text x="60" y="390" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Stop shipping risky changes until the mark is green.</text>
+
+          <rect x="580" y="40" width="480" height="400" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="600" y="80" fill="#5EEAD4" font-size="15" font-family="'JetBrains Mono', monospace">FINE</text>
+          <text x="600" y="114" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Internal green, advertised green,</text>
+          <text x="600" y="138" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">error budget left.</text>
+          <text x="600" y="180" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">INVEST ELSEWHERE</text>
+          <text x="600" y="216" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Technical debt: a shortcut that makes</text>
+          <text x="600" y="240" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">the next change harder (night restarts).</text>
+          <text x="600" y="276" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">New features, or another product.</text>
+          <text x="600" y="336" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">Do not spend the week turning 28 ms</text>
+          <text x="600" y="360" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">into 20 ms. Users already have the promise.</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--gslb); height:0; border-top:2px dashed var(--gslb); width:18px;"></i>not fine, fix the service</span>
+        <span><i class="swatch" style="background:var(--req)"></i>fine, features and debt</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="step-tag" id="stepTag">Step 1 of 3</div>
+        <div class="step-title" id="stepTitle"></div>
+        <div class="step-desc" id="stepDesc"></div>
+        <div class="controls">
+          <button id="prevBtn">◀ Back</button>
+          <button id="nextBtn" class="primary">Next ▶</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Chapter 4 · Service Level Objectives · <a href="https://sre.google/sre-book/service-level-objectives/">book chapter</a></footer>
+</div>
+
+<script>
+const steps = [
+  {
+    title: 'Ask the SLO, not the wish list',
+    desc: 'Each week: is the SLI still inside the SLO, and how much error budget is left? That is "how well are we meeting expectations?" The answer picks the next pile of people. Same as control-loop step 2, on a planning calendar.',
+    on: ['ask']
+  },
+  {
+    title: 'Not fine: invest in the service',
+    desc: 'Internal mark red, or the week\'s budget almost gone. Faster means cut latency. More available means more requests succeed. More resilient means recover when something breaks (retries, a fallback, a second region). Stop risky ships until the mark is green.',
+    on: ['paths']
+  },
+  {
+    title: 'Fine: invest elsewhere',
+    desc: 'Both marks green, budget left. Technical debt is a shortcut that makes the next change harder (the 02:00 worker restart). Pay it down, or ship a feature, or start another product. Do not spend a green week turning 28 ms into 20 ms. Users already have the promise.',
+    on: ['paths']
+  }
+];
+
+let current = 0;
+let playing = false;
+let playTimer = null;
+
+const ids = ['ask','paths'];
+const els = {};
+ids.forEach(id => { els[id] = document.getElementById(id); });
+
+const progressEl = document.getElementById('progress');
+steps.forEach((s,i)=>{
+  const d = document.createElement('span');
+  d.addEventListener('click', ()=> goTo(i));
+  progressEl.appendChild(d);
+});
+
+function render(){
+  const s = steps[current];
+  ids.forEach(id => {
+    els[id].classList.remove('on');
+    if(s.on.includes(id)) els[id].classList.add('on');
+  });
+
+  document.getElementById('stepTag').textContent = 'Step ' + (current+1) + ' of ' + steps.length;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').textContent = s.desc;
+
+  [...progressEl.children].forEach((d,i)=>{
+    d.classList.toggle('now', i===current);
+    d.classList.toggle('done', i<=current);
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===steps.length-1;
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(steps.length-1, i));
+  render();
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playing){
+    playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+    return;
+  }
+  playing=true; playBtn.textContent='⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(current>=steps.length-1){
+      playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+      return;
+    }
+    goTo(current+1);
+  }, 2200);
+});
+
+render();
+</script>
+</body>
+</html>
