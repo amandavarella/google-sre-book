@@ -401,20 +401,24 @@ as the same product.
 Shape is important when the *typical* request and the *tail* request are different product
 promises:
 
-- **Search / a checkout button.** p90 is the time 90 of 100 requests beat. That is what most
-  people feel when they click. p99 is the time 99 of 100 beat. That is the unlucky 1%. If p99
-  is under 100 ms (the SLO is green) but p90 is already 85 ms, almost every click is slow.
-  Users do not meet the fast 1%. They meet the slow 90. The product feels slow to everyone,
-  not only to the tail. One SLO at 100 ms cannot see this, because both the 85 ms clicks and
-  the 99 ms click still pass.
+- **Search / a checkout button.** Sort the 100 request times from fastest to slowest. **p90**
+  is the time of request number 90 in that list. 90 of 100 finished in that time or less. That
+  is what most people feel when they click. **p99** is the time of request number 99. 99 of
+  100 finished in that time or less. That is the unlucky 1%. If p99 is under 100 ms (the SLO
+  still looks healthy) but p90 is already 85 ms, almost every click is slow. Users do not get
+  the fast 1%. They get the slow 90. The product feels slow to everyone, not only to the
+  unlucky one. One SLO at 100 ms cannot see this, because both the 85 ms clicks and the 99 ms
+  click still pass.
 - **A batch report.** Users will wait seconds for a nightly PDF. They do not need 90 of 100
   reports in 1 ms. They need the report to arrive before the morning meeting. So you watch the
   far tail: how late is the slow one?
 
-  **What `p99` and `p99.9` mean.** The number after `p` is a percent. `p99` is the time that
-  99 of 100 jobs beat (1 in 100 is slower). `p99.9` is the time that 999 of 1,000 jobs beat
-  (1 in 1,000 is slower). The slash in `p99 / p99.9` was only "or": pick p99, or pick the even
-  rarer p99.9 if one late job in a thousand is still too many.
+  **What `p99` and `p99.9` mean.** The number after `p` is a percent. Sort the jobs from
+  fastest to slowest. `p99` is the time of job number 99 out of 100: 99 of 100 finished in
+  that time or less, and 1 of 100 is slower. `p99.9` is the time of job number 999 out of
+  1,000: 999 of 1,000 finished in that time or less, and 1 of 1,000 is slower. Write "p99 or
+  p99.9", not `p99 / p99.9`. Pick p99, or pick p99.9 if one late job in a thousand is still
+  too many.
 
   Example: 1,000 reports must be in inboxes by 08:00. 999 finish by 07:50. One finishes at
   10:00. p99 is still about 07:50 (only 1 in 100 is allowed to be later, and you have only 1
@@ -422,9 +426,10 @@ promises:
   nothing may be late" is the promise, p99.9 is the number you set a deadline on. Spending
   money to make p90 = 1 ms would make the typical report faster in a way nobody in the room
   can feel.
-- **Two user populations.** Mobile clients on slow networks vs an internal admin tool on the
-  same API. One 100 ms SLO is a compromise that fits neither. Two targets (or two SLOs) make
-  the two humps visible.
+- **Two user populations.** The same API serves phones on slow networks and an internal admin
+  tool on a fast office network. Phone requests cluster around a slower time. Admin requests
+  cluster around a faster time. One 100 ms SLO is a compromise that fits neither group. Two
+  targets (or two SLOs, one per client type) make both groups visible.
 - **A regression that "still passes."** The common path is the code every request runs (auth,
   logging, a new feature check). Engineers add work there. Before: 90 of 100 requests finish
   in 1 ms. After: those same 90 finish in 80 ms. The one slow request is still under 100 ms,
@@ -444,8 +449,8 @@ That is why the book offers a *stack* of SLOs when shape matters:
 - `99% of Get RPC calls will complete in less than 10 ms.`
 - `99.9% of Get RPC calls will complete in less than 100 ms.`
 
-Together they say: most requests are tiny, almost all are still small, and only a thin tail may
-reach 100 ms. Service B above would fail the first two lines. See
+Together they say: most requests finish in about 1 ms, almost all still finish in 10 ms, and
+only a few may take as long as 100 ms. Service B above would miss the first two lines. See
 [Same SLO, two shapes](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html).
 
 ## Key takeaways
@@ -454,7 +459,7 @@ reach 100 ms. Service B above would fail the first two lines. See
   are the targets you set on those measurements. You need a good SLI before an SLO means
   anything.
 - Treat metrics as distributions, not averages. An average latency can stay flat all day while
-  p95/p99 get 20× worse; alert on the tail you care about, not the mean.
+  p95 and p99 get 20× worse. Alert on the slow requests you care about, not the mean.
 - Standardize SLIs with reusable templates (availability, latency, throughput, durability,
   pipeline freshness). Once the house defaults are agreed, an individual SLI is just the service
   name plus any override.
@@ -465,20 +470,22 @@ reach 100 ms. Service B above would fail the first two lines. See
   approximate. Starting from what's easy to measure produces weaker SLOs.
 - A short SLO can omit the measurement rules once those rules live in the SLI template. The
   short line is not a weaker promise.
-- One SLO pins one point on the distribution. Many shapes can pass `99% < 100 ms`. Stack
-  several targets (p90 / p99 / p99.9) when the typical request and the tail are both part of
-  the product promise.
+- One SLO pins one point on the distribution. Many shapes can pass `99% < 100 ms`. Use several
+  targets (p90, p99, and p99.9) when both the typical request and the rare slow request matter
+  to the product.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
 - Availability as "fraction of well-formed requests that succeed" (yield) is the practical,
   achievable framing; 100% is off the table, so talk in nines instead (Google Compute Engine
   targets "three and a half nines", 99.95%).
-- Some SLOs aren't yours to set (traffic volume is demand-driven), and the ones you do set can
-  interact: pushing throughput up tends to push latency up too, up to a performance cliff.
-- Publish your SLOs. An explicit, shared target beats letting users guess, since unstated
-  expectations drift into either over-reliance (assuming more availability than you deliver) or
-  under-reliance (assuming you're flakier than you are).
+- Some SLOs aren't yours to set: how many users arrive (traffic volume) is their choice, not a
+  target you pick. The SLOs you do set can pull on each other. If you push the service to
+  handle more requests per second, each request often gets slower. Past a load point (a
+  performance cliff) latency jumps all at once, not a little at a time.
+- Publish your SLOs. A written target is better than letting users guess. If you never say the
+  number, people invent one: they assume you are more available than you are, or less available
+  than you are.
 - SLA is an SLO plus a consequence for missing it. SRE doesn't own SLAs (they're a business
   decision), but does own keeping the service inside them and defining the SLIs they're measured
   against. Even without a formal SLA, unavailability still has real consequences (reputation,

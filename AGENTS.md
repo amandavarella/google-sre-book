@@ -33,9 +33,11 @@ English is a second language. Write so a careful reader can study without decodi
   sluggish at p90"), unpack it before she has to ask: say what p90 and p99 *are*, then say who
   feels each one, then say why that matters. Do not use a metaphor ("trains users to wait")
   when a number will do. Do not write `p99 / p99.9` or `90% / 1 ms` to mean "or" or "under":
-  write the full phrase. Say what "page you" means the first time (an on-call alert). When she
-  asks "I don't get X", rewrite X in the notes that same way, and treat the question as a
-  style bug to avoid next time.
+  write the full phrase. Say what "page you" means the first time (an on-call alert). Never
+  use "beat" for a percentile: say "finished in that time or less." When she asks "I don't get
+  X", rewrite X in the notes, then scan the *rest of the current chapter after that passage*
+  for the same kind of packed word (another metaphor, another slash, another undefined `pNN`)
+  and fix those too. Do not rewrite earlier sections she has already worked through.
 
 ## Commands
 
