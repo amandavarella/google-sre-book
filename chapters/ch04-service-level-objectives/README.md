@@ -147,7 +147,7 @@ Aggregate raw measurements carefully. Most metrics are distributions, not averag
   hides those tail latencies, and hides changes in them.
 - Figure 4-1: a typical request is served in about 50 ms, but 5% of requests are 20 times slower.
   If you monitor and alert only on average latency, the day looks unchanged, even while the tail
-  (p95 / p99) is moving a lot. See [Latency percentiles](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html).
+  (p95 or p99) is moving a lot. See [Latency percentiles](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html).
 
 ##### A Note on Statistical Fallacies
 
@@ -337,7 +337,7 @@ it).
   can be retrieved with a matching checksum, measured by a weekly audit job."
 - Short: **"Photo store durability."**
 
-##### Template: Pipeline freshness (batch / big data)
+##### Template: Pipeline freshness (batch or big data)
 
 End-to-end time from ingestion to a completed, correct output record, plus records processed per
 minute.
@@ -401,7 +401,7 @@ as the same product.
 Shape is important when the *typical* request and the *tail* request are different product
 promises:
 
-- **Search / a checkout button.** Sort the 100 request times from fastest to slowest. **p90**
+- **Search or a checkout button.** Sort the 100 request times from fastest to slowest. **p90**
   is the time of request number 90 in that list. 90 of 100 finished in that time or less. That
   is what most people feel when they click. **p99** is the time of request number 99. 99 of
   100 finished in that time or less. That is the unlucky 1%. If p99 is under 100 ms (the SLO
@@ -413,12 +413,9 @@ promises:
   reports in 1 ms. They need the report to arrive before the morning meeting. So you watch the
   far tail: how late is the slow one?
 
-  **What `p99` and `p99.9` mean.** The number after `p` is a percent. Sort the jobs from
-  fastest to slowest. `p99` is the time of job number 99 out of 100: 99 of 100 finished in
-  that time or less, and 1 of 100 is slower. `p99.9` is the time of job number 999 out of
-  1,000: 999 of 1,000 finished in that time or less, and 1 of 1,000 is slower. Write "p99 or
-  p99.9", not `p99 / p99.9`. Pick p99, or pick p99.9 if one late job in a thousand is still
-  too many.
+  **What `p99` and `p99.9` mean.** The number after `p` is a percent. `p99` is the time that
+  99 of 100 jobs finish in that time or less (1 in 100 is slower). `p99.9` is the time that
+  999 of 1,000 jobs finish in that time or less (1 in 1,000 is slower).
 
   Example: 1,000 reports must be in inboxes by 08:00. 999 finish by 07:50. One finishes at
   10:00. p99 is still about 07:50 (only 1 in 100 is allowed to be later, and you have only 1
