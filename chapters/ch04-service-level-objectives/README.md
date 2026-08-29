@@ -8,7 +8,11 @@
 
 <!-- obsidian:start -->
 
-## Notes
+## Service Level Terminology
+
+The book splits one overloaded word (people say "SLA" for everything) into three: the
+measurement (SLI), the target (SLO), and the contract with a consequence (SLA). These notes
+keep that split.
 
 ### Indicators
 
@@ -94,7 +98,7 @@ that number, so you do not promise "we will receive 10,000 QPS." You still watch
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">SLI vs SLO</a>.
 
-### The Global Chubby Planned Outage (case study)
+### The Global Chubby Planned Outage
 
 Global Chubby is Google's distributed lock service, replicated so each instance spans multiple
 geographical regions for resilience. It turned out to be so reliable that other teams started
@@ -139,9 +143,9 @@ the consequences of meeting or missing the SLOs it contains.
 - Whether or not a service has an SLA, defining SLIs and SLOs and using them to manage the
   service is valuable either way.
 
-### Indicators in Practice
+## Indicators in Practice
 
-#### What Do You and Your Users Care About?
+### What Do You and Your Users Care About?
 
 Don't turn every trackable metric into an SLI. Pick a handful of indicators that reflect what
 users actually want from the system. Too many indicators makes it hard to pay attention to the
@@ -162,7 +166,7 @@ is usually enough to reason about a system's health.
   even though it's usually a property of the data rather than the infrastructure, and so is often
   not an SRE responsibility to meet.
 
-#### Collecting Indicators
+### Collecting Indicators
 
 Most indicator metrics are best gathered **server-side**, using a monitoring system such as
 Borgmon or Prometheus, or via periodic log analysis, for example tracking **HTTP 500** responses
@@ -179,7 +183,7 @@ request, a server-side failure) as a fraction of all requests.
   long it takes for the page to become usable in the browser is a better proxy for what the user
   actually experiences.
 
-#### Aggregation
+### Aggregation
 
 Aggregate raw measurements carefully. Most metrics are distributions, not averages.
 
@@ -189,7 +193,7 @@ Aggregate raw measurements carefully. Most metrics are distributions, not averag
   If you monitor and alert only on average latency, the day looks unchanged, even while the tail
   (p95 or p99) is moving a lot. See <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">Latency percentiles</a>.
 
-##### A Note on Statistical Fallacies
+#### A Note on Statistical Fallacies
 
 Percentiles are usually more useful than the arithmetic mean (the average). They show the long
 tail, which often behaves differently from the middle of the data. Computer systems produce
@@ -318,7 +322,7 @@ The timeout then breaks the same rule in the other direction: a server hung for 
 as 1,000 ms, same as a request that just grazed the deadline. The automation never sees a 30 s
 outlier, so it does not restart when it should.
 
-#### Standardize Indicators
+### Standardize Indicators
 
 Standardize on common SLI definitions so you don't have to reason about them from first
 principles every time. Anything that matches the house template can be omitted from an
@@ -339,7 +343,7 @@ service name plus any override.
 **House defaults** (apply to every template below unless the SLI says otherwise): averaged over
 1 minute, all tasks in the cluster, sampled every 10 seconds, measured at the server.
 
-##### Template: Availability (serving)
+#### Template: Availability (serving)
 
 Proportion of well-formed requests that succeed (not 5xx). Client errors (4xx) are excluded, they
 are not the service failing.
@@ -348,7 +352,7 @@ are not the service failing.
   not 5xx, measured at the server, averaged over 1 minute, across all tasks in the cluster."
 - Once the template exists: **"Availability of Shakespeare search."**
 
-##### Template: Latency (serving)
+#### Template: Latency (serving)
 
 Time to last byte, as a distribution (p50 and p99), for HTTP GETs from black-box probing.
 
@@ -360,7 +364,7 @@ Time to last byte, as a distribution (p50 and p99), for HTTP GETs from black-box
   (measured across all the backend servers)`. Same meaning, because the parentheses are already
   in the template.
 
-##### Template: Throughput (serving)
+#### Template: Throughput (serving)
 
 Successful requests per second, using the same request filter as availability.
 
@@ -368,7 +372,7 @@ Successful requests per second, using the same request filter as availability.
 - Note: incoming demand is not an SLO you set, but successful throughput is still a useful SLI
   for capacity and cliffs.
 
-##### Template: Durability (storage)
+#### Template: Durability (storage)
 
 Proportion of records written that can still be read later (is the data still there when we need
 it).
@@ -377,7 +381,7 @@ it).
   can be retrieved with a matching checksum, measured by a weekly audit job."
 - Short: **"Photo store durability."**
 
-##### Template: Pipeline freshness (batch or big data)
+#### Template: Pipeline freshness (batch or big data)
 
 End-to-end time from ingestion to a completed, correct output record, plus records processed per
 minute.
@@ -389,7 +393,7 @@ minute.
 If a service needs something the template doesn't cover (client-side latency, a different
 percentile, only payloads under 1 kB), write the override and leave the rest implied.
 
-### Objectives in Practice
+## Objectives in Practice
 
 Start from what users care about, not from what is easy to measure. The thing users care about is
 often hard or impossible to measure, so you will use a proxy. If you start with whatever the
@@ -397,7 +401,7 @@ dashboard already has, the SLOs will be weaker. Working backward from the object
 then picking indicators that support it, works better than picking indicators first and inventing
 targets later.
 
-#### Defining Objectives
+### Defining Objectives
 
 Write the SLO so a stranger can measure it the same way you do. Say *what* is measured and
 *under which rules* it counts.
@@ -608,9 +612,9 @@ unspent risk that other teams start to depend on.
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Error budget</a>.
 
-#### Choosing Targets
+### Choosing Targets
 
-**Do not copy today's number as the SLO.**
+#### Don't pick a target based on current performance
 
 You still measure current performance. That tells you what the system can do today, and where
 it is weak. The mistake is taking that dashboard number and publishing it as the target
@@ -634,7 +638,7 @@ The other lock-in: today's p90 is 85 ms because the common path is fat (Service 
 shape note above). If you copy 85 ms as the SLO, the slow typical click becomes the promise.
 A later redesign that aims for 1 ms is "extra," because the SLO is already green.
 
-**Have as few SLOs as possible.**
+#### Have as few SLOs as possible
 
 Pick just enough to cover the attributes users notice: usually availability, latency, and
 maybe durability or freshness. Each extra SLO is another graph nobody watches.
@@ -722,7 +726,7 @@ See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>
 (last step).
 
-#### Control Measures
+### Control Measures
 
 SLIs and SLOs are the two numbers in a **control loop**: a cycle you repeat to steer the
 system. Think of a thermostat. The room temperature is the SLI (what you read). The
@@ -821,7 +825,7 @@ tracking is the same loop on the miss-rate SLI.
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Control loop</a>.
 
-#### SLOs Set Expectations
+### SLOs Set Expectations
 
 Publishing the SLOs tells users (and people who might become users) what the product will
 do. They use those numbers to decide "is this service right for us?"
@@ -869,9 +873,7 @@ assume "storage" means always-up, then discover the 7-hour month the hard way.
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">SLOs set expectations</a>.
 
-**Two tactics so the published number stays honest**
-
-**1. Keep a safety margin**
+#### Keep a safety margin
 
 Write two marks on the same SLI. The **advertised SLO** is what users see. The
 **internal SLO** is tighter. You act when you miss the internal mark. Users only see a
@@ -891,11 +893,11 @@ broken. The buffer is time: you respond while the promise they read is still tru
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">Safety margin</a>.
 
-**2. Don't overachieve**
+#### Don't overachieve
 
 Users depend on what they actually get, not the written SLO. If you run much better than
 you advertised, they treat that as the real promise, which is why Chubby takes planned
-outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outage-case-study) above).
+outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outage) above).
 
 **The SLO decides where the next week of people goes**
 
