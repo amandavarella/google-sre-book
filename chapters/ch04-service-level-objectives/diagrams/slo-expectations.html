@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>SLOs set expectations</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:720px; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px; align-items:start;}
+  @media(min-width:1100px){ .layout{grid-template-columns: 2.4fr 1fr;} }
+
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:14px; overflow:hidden;
+  }
+  svg{width:100%; height:auto; display:block;}
+
+  .layer{opacity:0; pointer-events:none; transition:opacity 0.35s ease;}
+  .layer.on{opacity:1; pointer-events:auto;}
+
+  .side{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px;
+  }
+  .step-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--req);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .step-title{font-size:18px; font-weight:700; margin-bottom:8px; line-height:1.3;}
+  .step-desc{font-size:14px; color:var(--text-dim); line-height:1.55;}
+
+  .controls{display:flex; gap:8px; margin-top:16px;}
+  button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    background:#16283F; color:var(--text); border:1px solid var(--panel-border);
+    border-radius:6px; padding:9px 14px; cursor:pointer; transition:all 0.15s;
+  }
+  button:hover:not(:disabled){border-color:var(--req); color:var(--req);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--req); color:#08131f; border-color:var(--req); font-weight:700;}
+  button.primary:hover{filter:brightness(1.08);}
+
+  .progress{display:flex; gap:5px; margin-top:14px; flex-wrap:wrap;}
+  .progress span{
+    width:100%; max-width:16px; height:5px; border-radius:3px; background:#233149; cursor:pointer;
+  }
+  .progress span.done{background:var(--req);}
+  .progress span.now{outline:2px solid #fff; outline-offset:1px;}
+
+  .legend{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:12px; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · SLOs set expectations</div>
+    <h1>Same offer. Two buyers.</h1>
+    <p class="sub">One storage service publishes cheap + keep-the-file + sometimes down. A photo app says no. An archive says yes. The written SLOs let each team choose before they build.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <svg viewBox="0 0 1100 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ex-title ex-desc">
+        <title id="ex-title">SLOs set expectations</title>
+        <desc id="ex-desc">A storage offer: 99 percent availability, 99.99 percent durability, low cost. A photo-sharing team rejects it because seven hours down in a month breaks posting. An archive team accepts it because files must survive decades and a clerk can wait.</desc>
+
+        <g id="offer" class="layer">
+          <rect x="200" y="40" width="700" height="220" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="550" y="78" fill="#5EEAD4" font-size="15" font-family="'JetBrains Mono', monospace" text-anchor="middle">THE PUBLISHED OFFER</text>
+          <text x="230" y="120" fill="#5EEAD4" font-size="16" font-family="'JetBrains Mono', monospace">KEEP THE FILE</text>
+          <text x="230" y="146" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Durability 99.99%. About 1 file in 10,000 lost per year.</text>
+          <text x="230" y="184" fill="#5EEAD4" font-size="16" font-family="'JetBrains Mono', monospace">CHEAP</text>
+          <text x="230" y="210" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Low cost per gigabyte. Good for huge stores.</text>
+          <text x="230" y="248" fill="#FBBF24" font-size="16" font-family="'JetBrains Mono', monospace">IN EXCHANGE: SOMETIMES DOWN</text>
+        </g>
+        <g id="trade" class="layer">
+          <rect x="200" y="280" width="700" height="64" rx="8" fill="#16283F" stroke="#FBBF24" stroke-width="1.4"/>
+          <text x="550" y="320" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif" text-anchor="middle">Availability 99% = about 7 hours down in a typical month.</text>
+        </g>
+
+        <g id="buyers" class="layer">
+          <rect x="40" y="40" width="480" height="380" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="60" y="78" fill="#F472B6" font-size="15" font-family="'JetBrains Mono', monospace">PHOTO-SHARING APP</text>
+          <text x="60" y="114" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">People open it now to upload and look.</text>
+          <text x="60" y="150" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">7 hours down in a month: they cannot post.</text>
+          <text x="60" y="186" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">They also want photos kept, but not at</text>
+          <text x="60" y="210" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">the cost of an app that is often unreachable.</text>
+          <text x="60" y="260" fill="#F472B6" font-size="22" font-family="'JetBrains Mono', monospace">NO</text>
+          <text x="60" y="294" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">They pay more for a store that is up more often.</text>
+          <text x="60" y="330" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">Need: can I use it now?</text>
+
+          <rect x="580" y="40" width="480" height="380" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="600" y="78" fill="#5EEAD4" font-size="15" font-family="'JetBrains Mono', monospace">ARCHIVAL RECORDS</text>
+          <text x="600" y="114" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">Old files that must exist in 20 years.</text>
+          <text x="600" y="150" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">A clerk can wait until Wednesday if Tuesday is down.</text>
+          <text x="600" y="186" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">Losing a file is the disaster. Cheap matters:</text>
+          <text x="600" y="210" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">petabytes, for decades.</text>
+          <text x="600" y="260" fill="#5EEAD4" font-size="22" font-family="'JetBrains Mono', monospace">YES</text>
+          <text x="600" y="294" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">The published mix matches the job.</text>
+          <text x="600" y="330" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">Need: will the file still be there later?</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--req)"></i>yes, the archive</span>
+        <span><i class="swatch" style="background:var(--res)"></i>the trade: sometimes down</span>
+        <span><i class="swatch" style="background:var(--gslb); height:0; border-top:2px dashed var(--gslb); width:18px;"></i>no, the photo app</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="step-tag" id="stepTag">Step 1 of 3</div>
+        <div class="step-title" id="stepTitle"></div>
+        <div class="step-desc" id="stepDesc"></div>
+        <div class="controls">
+          <button id="prevBtn">◀ Back</button>
+          <button id="nextBtn" class="primary">Next ▶</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Chapter 4 · Service Level Objectives · <a href="https://sre.google/sre-book/service-level-objectives/">book chapter</a></footer>
+</div>
+
+<script>
+const steps = [
+  {
+    title: 'The service publishes a mix',
+    desc: 'Availability is "can I use it now?" Durability is "will the file still be there later?" This offer sells cheap plus keep-the-file. In exchange it does not sell always-up. Availability 99% is about 7 hours down in a typical month.',
+    on: ['offer','trade']
+  },
+  {
+    title: 'The photo app says no',
+    desc: 'People open it now to upload and look. Seven hours down in a month means they cannot post. They also want photos kept, but they will not take cheap-and-safe if the app is often unreachable. They pay more for a store that is up more often.',
+    on: ['buyers']
+  },
+  {
+    title: 'The archive says yes',
+    desc: 'The product is "this file still exists in 20 years." A clerk can wait until Wednesday. Losing a file is the disaster. Cheap matters because they keep petabytes for decades. Same offer. Two use cases. The written SLOs let each team choose before they build.',
+    on: ['buyers']
+  }
+];
+
+let current = 0;
+let playing = false;
+let playTimer = null;
+
+const ids = ['offer','trade','buyers'];
+const els = {};
+ids.forEach(id => { els[id] = document.getElementById(id); });
+
+const progressEl = document.getElementById('progress');
+steps.forEach((s,i)=>{
+  const d = document.createElement('span');
+  d.addEventListener('click', ()=> goTo(i));
+  progressEl.appendChild(d);
+});
+
+function render(){
+  const s = steps[current];
+  ids.forEach(id => {
+    els[id].classList.remove('on');
+    if(s.on.includes(id)) els[id].classList.add('on');
+  });
+
+  document.getElementById('stepTag').textContent = 'Step ' + (current+1) + ' of ' + steps.length;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').textContent = s.desc;
+
+  [...progressEl.children].forEach((d,i)=>{
+    d.classList.toggle('now', i===current);
+    d.classList.toggle('done', i<=current);
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===steps.length-1;
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(steps.length-1, i));
+  render();
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playing){
+    playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+    return;
+  }
+  playing=true; playBtn.textContent='⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(current>=steps.length-1){
+      playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+      return;
+    }
+    goTo(current+1);
+  }, 2400);
+});
+
+render();
+</script>
+</body>
+</html>

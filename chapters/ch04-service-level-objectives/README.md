@@ -774,6 +774,54 @@ tracking is the same loop on the miss-rate SLI.
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Control loop</a>.
 
+#### SLOs Set Expectations
+
+Publishing the SLOs tells users (and people who might become users) what the product will
+do. They use those numbers to decide "is this service right for us?"
+
+**Availability** is "can I use it *now*?" The share of requests that succeed when someone
+tries. **Durability** is "will the file still be there *later*?" The share of written
+objects you can still read back next year.
+
+You rarely get all three of: always up, never lose a file, and cheap. A service picks a
+mix and writes it as SLOs. That mix is the offer.
+
+**The book's example, unpacked**
+
+One storage service publishes this offer:
+
+- Very strong **durability** (almost never lose a file)
+- Low **cost**
+- In exchange: slightly lower **availability** (sometimes you cannot reach it *now*)
+
+"In exchange" means the trade. They sold cheap + keep-the-file. They did not sell
+always-up.
+
+Put numbers on it so the two buyers can choose.
+
+| SLO they published | In a year that means |
+|---|---|
+| Availability 99% | Down about 7 hours in a typical month (3.65 days in a year) |
+| Durability 99.99% | About 1 file in 10,000 is lost in a year |
+| Price | Cheap per gigabyte |
+
+**Photo-sharing site (Instagram-like).** People open the app *now* to upload and look.
+Seven hours down in a month is a broken product. Users cannot post. They also care about
+not losing photos, but they will not take "cheap and safe files" if the app is often
+unreachable. They **avoid** this service. They pay more for a store that is up more often.
+
+**Archival records (a government warehouse of old files).** The product is "this file
+still exists in 20 years." A clerk can wait until Wednesday if Tuesday is down. Losing
+a file is the disaster. Cheap matters because they keep petabytes for decades. They
+**pick** the same service. The published SLOs match the job.
+
+Same offer. Two use cases. The SLOs let each team say yes or no *before* they build on
+it. That is what "sets expectations" means. Without the written mix, the photo team might
+assume "storage" means always-up, then discover the 7-hour month the hard way.
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">SLOs set expectations</a>.
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -824,7 +872,8 @@ See
   performance cliff) latency jumps all at once, not a little at a time.
 - Publish your SLOs. A written target is better than letting users guess. If you never say the
   number, people invent one: they assume you are more available than you are, or less available
-  than you are.
+  than you are. The same published mix (cheap, keep the file, sometimes down) is a no for a
+  photo app and a yes for an archive. The numbers let each team choose before they build.
 - SLA is an SLO plus a consequence for missing it. SRE doesn't own SLAs (they're a business
   decision), but does own keeping the service inside them and defining the SLIs they're measured
   against. Even without a formal SLA, unavailability still has real consequences (reputation,
@@ -844,6 +893,7 @@ See
 | **Error budget**: 99.9% succeed means 1 of 1,000 may fail; that leftover is the spend you track | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that change ship or wait; last step is the lever (too tight, just enough, too loose) | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Control loop**: measure the SLI, compare to the SLO, find an action, act; without the mark, 28 ms → 45 ms has no deadline | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **SLOs set expectations**: same offer (cheap, keep the file, sometimes down); photo app says no, archive says yes | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
