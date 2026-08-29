@@ -568,6 +568,53 @@ unspent risk that other teams start to depend on.
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Error budget</a>.
 
+#### Choosing Targets
+
+**Do not copy today's number as the SLO.**
+
+You still measure current performance. That tells you what the system can do today, and where
+it is weak. The mistake is taking that dashboard number and publishing it as the target
+without asking whether users need that number, and what it costs to keep hitting it.
+
+**Heroic effort** means the number only holds because people do manual work the system cannot
+do: two engineers restart stuck workers every night, or they babysit every deploy. That is
+not a property of the product. It is overtime.
+
+Example: tonight's dashboard says p99 (the time 99 of 100 requests finish in or less) is
+10 ms. How? Two people restart workers at 02:00. You publish `99% of Sets finish in under
+10 ms`. Now the night restarts are part of the promise. You cannot stop them without missing
+the SLO. The only way out is a redesign that makes 10 ms true without the heroes. You locked
+the current architecture in.
+
+Reflect first. Ask: what do users need? If they are happy at 50 ms, write `99% under 50 ms`.
+The night restarts can stop. The SLO stays green. You still know the system can do 10 ms
+today. That fact is a merit, not a contract.
+
+The other lock-in: today's p90 is 85 ms because the common path is fat (Service B in the
+shape note above). If you copy 85 ms as the SLO, the slow typical click becomes the promise.
+A later redesign that aims for 1 ms is "extra," because the SLO is already green.
+
+**Have as few SLOs as possible.**
+
+Pick just enough to cover the attributes users notice: usually availability, latency, and
+maybe durability or freshness. Each extra SLO is another graph nobody watches.
+
+**The conversation test.** Keep an SLO only if you can win a priority argument by quoting it.
+
+- Keep: `99% of small Sets finish in under 50 ms.` "Should we ship the new photo filter this
+  week?" The filter adds 80 ms to every click. You can say wait, or ship it behind a flag.
+  The SLO did work.
+- Drop: `CPU idle stays above 40%.` Nobody has ever delayed a launch by quoting that line.
+  It is a capacity hint, not a user promise.
+
+Not every product wish can be an SLO. **User delight** has no shared measurement. Two people
+will not agree on a number, and you cannot page on-call for "less delighted." Keep delight
+as a product goal. Put an SLO on the pieces you can count (the click was fast, the write
+stayed).
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>.
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -594,6 +641,10 @@ See
   allowed misses you spend on purpose. Track the spend every day or every week so you can
   steer. A month or quarter rollup is for management. That "stay inside the allowance" line
   is itself an SLO on the other SLOs.
+- Do not copy today's dashboard number as the SLO. Measure current performance to learn
+  merits and limits. Publishing that number without reflection locks in today's architecture
+  and any heroic effort that produced it. Keep as few SLOs as you can defend: if a line never
+  wins a priority argument, drop it. "User delight" is not an SLO.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -623,6 +674,7 @@ See
 | **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Two workload classes**: same `Set` RPC; pipeline 95% under 1 s, small clicks 99% under 10 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Error budget**: 99.9% succeed means 1 of 1,000 may fail; that leftover is the spend you track | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that win an argument | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 

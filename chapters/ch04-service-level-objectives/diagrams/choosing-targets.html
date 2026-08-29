@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Choosing targets</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:720px; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px; align-items:start;}
+  @media(min-width:1100px){ .layout{grid-template-columns: 2.4fr 1fr;} }
+
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:14px; overflow:hidden;
+  }
+  svg{width:100%; height:auto; display:block;}
+
+  .layer{opacity:0; pointer-events:none; transition:opacity 0.35s ease;}
+  .layer.on{opacity:1; pointer-events:auto;}
+
+  .side{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px;
+  }
+  .step-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--req);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .step-title{font-size:18px; font-weight:700; margin-bottom:8px; line-height:1.3;}
+  .step-desc{font-size:14px; color:var(--text-dim); line-height:1.55;}
+
+  .controls{display:flex; gap:8px; margin-top:16px;}
+  button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    background:#16283F; color:var(--text); border:1px solid var(--panel-border);
+    border-radius:6px; padding:9px 14px; cursor:pointer; transition:all 0.15s;
+  }
+  button:hover:not(:disabled){border-color:var(--req); color:var(--req);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--req); color:#08131f; border-color:var(--req); font-weight:700;}
+  button.primary:hover{filter:brightness(1.08);}
+
+  .progress{display:flex; gap:5px; margin-top:14px; flex-wrap:wrap;}
+  .progress span{
+    width:100%; max-width:16px; height:5px; border-radius:3px; background:#233149; cursor:pointer;
+  }
+  .progress span.done{background:var(--req);}
+  .progress span.now{outline:2px solid #fff; outline-offset:1px;}
+
+  .legend{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:12px; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · Choosing targets</div>
+    <h1>Choosing targets</h1>
+    <p class="sub">Measure what the system does today. Do not publish that number as the SLO. Keep only the SLOs that can win a priority argument.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <svg viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ct-title ct-desc">
+        <title id="ct-title">Choosing targets</title>
+        <desc id="ct-desc">Today p99 is 10 milliseconds because two people restart workers at night. Copying 10 milliseconds as the SLO locks those heroes in. Reflecting first sets 50 milliseconds, which users already accept. Then only keep SLOs that win an argument.</desc>
+
+        <!-- Dashboard: always useful -->
+        <g id="dash" class="layer">
+          <rect x="40" y="28" width="420" height="150" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="60" y="58" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">DASHBOARD · TONIGHT</text>
+          <text x="60" y="96" fill="#E7EDF6" font-size="28" font-family="'JetBrains Mono', monospace">p99 = 10 ms</text>
+          <text x="60" y="126" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">99 of 100 Sets finish in 10 ms or less.</text>
+          <text x="60" y="154" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif">How: two people restart workers at 02:00.</text>
+        </g>
+
+        <g id="copy" class="layer">
+          <path d="M460 103 L530 103" stroke="#F472B6" stroke-width="2"/>
+          <polygon points="530,98 544,103 530,108" fill="#F472B6"/>
+          <rect x="560" y="28" width="500" height="150" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="580" y="58" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">COPY AS THE SLO</text>
+          <text x="580" y="96" fill="#E7EDF6" font-size="22" font-family="'JetBrains Mono', monospace">99% under 10 ms</text>
+          <text x="580" y="126" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">Night restarts are now part of the promise.</text>
+          <text x="580" y="154" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Stop them, and the SLO misses. Exit: redesign.</text>
+        </g>
+
+        <g id="reflect" class="layer">
+          <path d="M250 178 L250 214" stroke="#5EEAD4" stroke-width="2"/>
+          <polygon points="245,214 250,228 255,214" fill="#5EEAD4"/>
+          <rect x="40" y="236" width="1020" height="88" rx="10" fill="#16283F" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="60" y="268" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">REFLECT FIRST</text>
+          <text x="60" y="294" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">Users are already happy at 50 ms. Write 99% under 50 ms. Night restarts can stop. The 10 ms fact stays a merit, not a contract.</text>
+        </g>
+
+        <g id="few" class="layer">
+          <rect x="40" y="348" width="500" height="140" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="60" y="378" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">KEEP · WINS AN ARGUMENT</text>
+          <text x="60" y="408" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99% of small Sets under 50 ms</text>
+          <text x="60" y="430" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99.9% of Sets succeed</text>
+          <text x="60" y="452" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">"The photo filter adds 80 ms. Wait."</text>
+          <rect x="560" y="348" width="500" height="140" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="580" y="378" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">DROP · NEVER QUOTED</text>
+          <text x="580" y="408" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">CPU idle above 40%</text>
+          <text x="580" y="430" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">User delight above 80%</text>
+          <text x="580" y="452" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">No shared number. Cannot page on-call.</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--req)"></i>measure, then reflect</span>
+        <span><i class="swatch" style="background:var(--res)"></i>heroic effort (night restarts)</span>
+        <span><i class="swatch" style="background:var(--gslb); height:0; border-top:2px dashed var(--gslb); width:18px;"></i>copy without reflection</span>
+        <span><i class="swatch" style="background:var(--gslb)"></i>a line you never quote</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="step-tag" id="stepTag">Step 1 of 5</div>
+        <div class="step-title" id="stepTitle"></div>
+        <div class="step-desc" id="stepDesc"></div>
+        <div class="controls">
+          <button id="prevBtn">◀ Back</button>
+          <button id="nextBtn" class="primary">Next ▶</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Chapter 4 · Service Level Objectives · <a href="https://sre.google/sre-book/service-level-objectives/">book chapter</a></footer>
+</div>
+
+<script>
+const steps = [
+  {
+    title: 'Measure current. That is not the target.',
+    desc: 'Tonight p99 is 10 ms: 99 of 100 Sets finish in 10 ms or less. Useful. It tells you what the system can do today. The cost is hidden on the same board: two people restart workers at 02:00.',
+    on: ['dash']
+  },
+  {
+    title: 'Copy 10 ms, and you lock the heroes in',
+    desc: 'Publish 99% under 10 ms and the night restarts become part of the promise. Stop them, and the SLO misses. The only way out is a redesign that makes 10 ms true without people. You locked today\'s architecture in.',
+    on: ['dash', 'copy']
+  },
+  {
+    title: 'Reflect first. Ask what users need.',
+    desc: 'If users are already happy at 50 ms, write 99% under 50 ms. Night restarts can stop. The SLO stays green. You still know the system can do 10 ms. That fact is a merit, not a contract.',
+    on: ['dash', 'reflect']
+  },
+  {
+    title: 'Keep only SLOs that win an argument',
+    desc: 'Should we ship the photo filter this week? It adds 80 ms to every click. The 50 ms click SLO lets you say wait. A CPU-idle line has never delayed a launch. Drop it. Fewer SLOs means the ones you keep get watched.',
+    on: ['few']
+  },
+  {
+    title: 'User delight is not an SLO',
+    desc: 'Two people will not agree on a number for delight. You cannot send an on-call alert for "less delighted." Keep delight as a product goal. Put an SLO on the pieces you can count: the click was fast, the write stayed.',
+    on: ['few']
+  }
+];
+
+let current = 0;
+let playing = false;
+let playTimer = null;
+
+const ids = ['dash','copy','reflect','few'];
+const els = {};
+ids.forEach(id => { els[id] = document.getElementById(id); });
+
+const progressEl = document.getElementById('progress');
+steps.forEach((s,i)=>{
+  const d = document.createElement('span');
+  d.addEventListener('click', ()=> goTo(i));
+  progressEl.appendChild(d);
+});
+
+function render(){
+  const s = steps[current];
+  ids.forEach(id => {
+    els[id].classList.remove('on');
+    if(s.on.includes(id)) els[id].classList.add('on');
+  });
+
+  document.getElementById('stepTag').textContent = 'Step ' + (current+1) + ' of ' + steps.length;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').textContent = s.desc;
+
+  [...progressEl.children].forEach((d,i)=>{
+    d.classList.toggle('now', i===current);
+    d.classList.toggle('done', i<=current);
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===steps.length-1;
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(steps.length-1, i));
+  render();
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playing){
+    playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+    return;
+  }
+  playing=true; playBtn.textContent='⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(current>=steps.length-1){
+      playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+      return;
+    }
+    goTo(current+1);
+  }, 2200);
+});
+
+render();
+</script>
+</body>
+</html>
