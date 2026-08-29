@@ -72,8 +72,14 @@ one leaves the diagram unreachable from the site:
 2. `README.md` — a row in the "Interactive diagrams" table
 3. the chapter's own `README.md` — a row in its diagrams table
 
+Every diagram link in a README (root or chapter) must be the **live Pages URL**, never a
+relative `diagrams/*.html` path and never a GitHub blob/source link:
+
+`https://amandavarella.github.io/google-sre-book/chapters/chNN-slug/diagrams/<file>.html`
+
 Chapter rows in `index.html` deliberately link to the GitHub blob URL, not a relative path:
-Pages serves raw markdown as a download, whereas GitHub renders it.
+Pages serves raw markdown as a download, whereas GitHub renders it. The feature cards in
+`index.html` are already live relative paths and stay that way.
 
 ## Diagram conventions
 

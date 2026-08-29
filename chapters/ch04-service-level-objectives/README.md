@@ -147,7 +147,7 @@ Aggregate raw measurements carefully. Most metrics are distributions, not averag
   hides those tail latencies, and hides changes in them.
 - Figure 4-1: a typical request is served in about 50 ms, but 5% of requests are 20 times slower.
   If you monitor and alert only on average latency, the day looks unchanged, even while the tail
-  (p95 / p99) is moving a lot. See [Latency percentiles](diagrams/latency-percentiles.html).
+  (p95 / p99) is moving a lot. See [Latency percentiles](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html).
 
 ##### A Note on Statistical Fallacies
 
@@ -219,7 +219,7 @@ The left side is chopped too: nothing can finish in less than 0 ms. Together, fl
 ceiling at the timeout are why this is not a bell curve, and why mean and median need not be
 close.
 
-See the six-step walkthrough: [Mean vs median](diagrams/statistical-fallacies.html).
+See the six-step walkthrough: [Mean vs median](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html).
 
 **Why this breaks "restart on outlier" automation**
 
@@ -394,8 +394,8 @@ targets later.
 
 | Diagram | Open |
 | --- | --- |
-| **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | [View live](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html) · [source](diagrams/latency-percentiles.html) |
-| **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | [View live](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html) · [source](diagrams/statistical-fallacies.html) |
+| **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html) |
+| **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html) |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
