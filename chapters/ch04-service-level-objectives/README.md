@@ -420,9 +420,10 @@ promises:
   Example: 1,000 reports must be in inboxes by 08:00. 999 finish by 07:50. One finishes at
   10:00. p99 is still about 07:50 (only 1 in 100 is allowed to be later, and you have only 1
   late job in 1,000). p99.9 is 10:00: that is the one job that missed the meeting. If "almost
-  nothing may be late" is the promise, p99.9 is the number you set a deadline on. Spending
-  money to make p90 = 1 ms would make the typical report faster in a way nobody in the room
-  can feel.
+  nothing may be late" is the promise, p99.9 is the number you set a deadline on. Making the
+  999 on-time reports finish at 07:49 instead of 07:50 does not move the 10:00 report. The
+  meeting still misses that one file. Extra hardware for p90 = 1 ms does not fix the SLO you
+  actually set.
 - **Two user populations.** The same API serves phones on slow networks and an internal admin
   tool on a fast office network. Phone requests cluster around a slower time. Admin requests
   cluster around a faster time. One 100 ms SLO is a compromise that fits neither group. Two
@@ -432,13 +433,13 @@ promises:
   in 1 ms. After: those same 90 finish in 80 ms. The one slow request is still under 100 ms,
   so p99 has not moved past the 100 ms SLO.
 
-  If you only have one target (`99% under 100 ms`), the dashboard stays green. Nobody is
-  woken up. Users already feel the 80 ms wait on almost every click.
+  If you only have one target (`99% under 100 ms`), that SLO is still true. No alert fires.
+  90 of 100 clicks now take 80 ms instead of 1 ms.
 
   If you have the three targets below, the first one is now false: 90 of 100 requests are
   *not* under 1 ms. Monitoring marks that SLO as missed. **Page you** means it sends an
   on-call alert (phone, Slack, pager) to the engineer who is on duty, so someone looks at
-  the change the same day, not after a week of "the site feels slow" tickets.
+  the change the same day, not after a week of tickets that say the site is slow.
 
 That is why the book offers a *stack* of SLOs when shape matters:
 
@@ -496,7 +497,7 @@ only a few may take as long as 100 ms. Service B above would miss the first two 
 | --- | --- |
 | **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html) |
 | **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html) |
-| **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one feels instant | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html) |
+| **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html) |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 

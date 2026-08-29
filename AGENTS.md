@@ -31,9 +31,10 @@ English is a second language. Write so a careful reader can study without decodi
 - Never use em dashes. Use a comma, colon, or a new sentence.
 - **Anticipate the next question.** If a sentence packs two ideas (for example "fine at p99 and
   sluggish at p90"), unpack it before she has to ask: say what p90 and p99 *are*, then say who
-  feels each one, then say why that matters. Do not use a metaphor ("trains users to wait")
-  when a number will do. Do not write `p99 / p99.9` or `90% / 1 ms` to mean "or" or "under":
-  write the full phrase. Say what "page you" means the first time (an on-call alert). Never
+  feels each one, then say why that matters. Do not write lines like "nobody in the room can
+  feel" or "trains every user to wait". Say which number does not change. Do not write
+  `p99 / p99.9` or `90% / 1 ms` to mean "or" or "under": write the full phrase. Say what
+  "page you" means the first time (an on-call alert). Never
   use "beat" for a percentile: say "finished in that time or less." When she asks "I don't get
   X", rewrite X in the notes, then scan the *rest of the current chapter after that passage*
   for the same kind of packed word (another metaphor, another slash, another undefined `pNN`)
