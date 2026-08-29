@@ -59,9 +59,8 @@ All 34 chapters have a folder, most holding only an unfilled note stub. Folder n
 `ch` + zero-padded number + kebab slug (`ch02-production-environment`) so they sort correctly.
 The stub sections are Notes / Key takeaways / Interactive diagrams / Questions.
 
-Draft diagrams may first live in the Obsidian tech vault (`zimages/`) next to the book note.
-The same language and font rules apply there. When publishing, copy the HTML into
-`chapters/chNN-slug/diagrams/` and register it (see below).
+This repo is the only notes home. Write chapter notes and diagrams here and push to `main`.
+Do not keep a parallel copy in Obsidian.
 
 ## Adding a diagram
 
@@ -111,7 +110,7 @@ The reader must be able to study captions without squinting or decoding a displa
 - **Labels and chrome** (axis ticks, buttons, step titles in the UI): JetBrains Mono, as in the
   chapter 2 reference.
 - Open interactive HTML in the **system browser** (`open "path/to/file.html"`), not the IDE
-  browser. Obsidian does not run the HTML clicks.
+  browser.
 
 ### Sizing gotcha
 
