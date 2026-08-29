@@ -167,7 +167,7 @@
         <g id="fail-10ms" class="fail">
           <rect x="40" y="348" width="1020" height="68" rx="8" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
           <text x="550" y="376" fill="#F472B6" font-size="15" font-family="'JetBrains Mono', monospace" text-anchor="middle">ONE SLO: every Set under 10 ms</text>
-          <text x="550" y="400" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">The 10 MB dump cannot finish in 10 ms. On-call is paged for healthy batch work.</text>
+          <text x="550" y="400" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">The 10 MB dump cannot finish in 10 ms. Your phone rings for a fine dump, not for a slow click.</text>
         </g>
         <g id="fail-1s" class="fail">
           <rect x="40" y="348" width="1020" height="68" rx="8" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
@@ -226,7 +226,7 @@ const steps = [
   },
   {
     title: 'One 10 ms SLO fails the pipeline',
-    desc: 'If every Set must finish in 10 ms, the 10 MB dump is always late. On-call gets an alert (page you) for work that is healthy. You spent the error budget on batch jobs, not on broken clicks.',
+    desc: 'If every Set must finish in 10 ms, the 10 MB dump is always late. Your phone rings because the dump took 400 ms. The dump is fine. A slow click does not ring the phone. The alarm is on the wrong customer.',
     show: ['lane-pipe', 'lane-phone', 'fail-10ms']
   },
   {

@@ -483,7 +483,7 @@ paragraph of text. The second line only counts those small writes.
 
 | If you write… | What happens |
 |---|---|
-| One SLO: every `Set` under 10 ms | The pipeline fails every day. A 10 MB nightly dump cannot finish in 10 ms. On-call gets paged for healthy batch work. |
+| One SLO: every `Set` under 10 ms | The pipeline fails every day. A 10 MB nightly dump cannot finish in 10 ms. Your phone rings for that dump. The dump is fine. A slow click does not ring. |
 | One SLO: every `Set` under 1 s | The phone can wait up to 1 second and the SLO stays green. No alert. The click feels broken. |
 | One mixed bucket of all `Set`s | The pipeline may send millions of large writes. Combined p99 (the time 99 of 100 finish in or less) looks like those large writes. The 10 ms clicks disappear in the pile. |
 
