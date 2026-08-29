@@ -83,16 +83,22 @@ implementation. Copy its structure rather than inventing a new one.
 
 - **Self-contained.** One file, inline CSS and JS, no local imports. Google Fonts
   (JetBrains Mono for labels/UI, Inter for prose) is the only external reference.
-- **Shared palette** via CSS custom properties on `:root`. The three signal colors carry
-  meaning and are consistent across diagrams: `--req` cyan for the forward/request path,
-  `--res` amber for the return/response path, `--gslb` pink dashed for side lookups.
+- **Dark house palette only.** Always the `:root` colours from the chapter 2 file
+  (`--bg`, `--panel`, `--req` cyan, `--res` amber, `--gslb` pink). Never ship the light
+  paper / orange-accent look from `diagram-design`. That skill may still draw a first draft;
+  restyle to this palette before the file is treated as done.
+- **Shared signal colours** carry meaning: `--req` cyan for the typical / request / success
+  path, `--res` amber for the return path or the thing you must notice (a spike, a timeout),
+  `--gslb` pink dashed for a side path or a false model.
 - **Step-through pattern.** A `steps` array drives everything; the SVG itself is static markup.
-  Each step object has `phase` (`'req'` or `'res'`), `title`, `desc`, a `nodes` array of node ids
-  to highlight, and either `edge` (single edge, animates a dot along the path) or `multiEdge`
-  (several edges lit at once, no dot). `render()` clears all state and reapplies from the current
-  step, so steps are order-independent and jumping around via the progress bar is safe.
-- SVG element ids are `n-<node>` for nodes and `e-<from>-<to>` for edges; the JS looks them up
-  by those exact strings, so renaming one means updating the id arrays near the top of the script.
+  Each step object has `title`, `desc`, and whatever ids to show. `render()` clears all state
+  and reapplies from the current step, so steps are order-independent and jumping around via
+  the progress bar is safe. For path diagrams, each step also has `phase` (`'req'` or `'res'`),
+  a `nodes` array, and either `edge` or `multiEdge`.
+- **Chrome.** Header (eyebrow + JetBrains Mono `h1` + Inter `sub`), a `.stage` panel for the
+  SVG, a `.side` card for step text / Back / Next / Play. Same button and progress styles as
+  chapter 2.
+- SVG element ids on path diagrams are `n-<node>` for nodes and `e-<from>-<to>` for edges.
 
 ### Readable step text
 
@@ -104,9 +110,6 @@ The reader must be able to study captions without squinting or decoding a displa
   multi-sentence caption.
 - **Labels and chrome** (axis ticks, buttons, step titles in the UI): JetBrains Mono, as in the
   chapter 2 reference.
-- Do not follow `diagram-design`'s Instrument Serif / italic caption default for this book.
-  That skill may still draw the first HTML, then restyle to Inter + JetBrains Mono before the
-  file is treated as done.
 - Open interactive HTML in the **system browser** (`open "path/to/file.html"`), not the IDE
   browser. Obsidian does not run the HTML clicks.
 

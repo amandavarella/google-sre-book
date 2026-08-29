@@ -1,161 +1,143 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Latency percentiles hide in the average</title>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <style>
-    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    :root {
-      --color-paper:   #f5f5f5;
-      --color-ink:     #2d3142;
-      --color-muted:   #4f5d75;
-      --color-accent:  #eb6c36;
-      --font-sans:     'Inter', system-ui, sans-serif;
-      --font-serif:    'Inter', sans-serif;
-      --font-mono:     'JetBrains Mono', ui-monospace, monospace;
-    }
-    body {
-      font-family: var(--font-sans);
-      background: var(--color-paper);
-      color: var(--color-ink);
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 3rem 2rem;
-    }
-    .frame { max-width: 1200px; width: 100%; }
-    .eyebrow {
-      font-family: var(--font-mono);
-      font-size: 0.66rem;
-      font-weight: 500;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--color-muted);
-      margin-bottom: 0.5rem;
-    }
-    h1 {
-      font-family: var(--font-serif);
-      font-size: clamp(1.5rem, 2.4vw + 0.75rem, 2rem);
-      font-weight: 400;
-      letter-spacing: -0.02em;
-      line-height: 1.15;
-      color: var(--color-ink);
-      margin-bottom: 1.5rem;
-    }
-    svg { width: 100%; min-width: 900px; display: block; }
-  </style>
+<meta charset="UTF-8">
+<title>Latency percentiles</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:640px; line-height:1.5;}
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:18px 14px 10px; margin-top:24px;
+  }
+  svg{width:100%; height:auto; display:block;}
+  .legend{
+    display:flex; gap:18px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:8px; padding:8px 8px 4px; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
 </head>
 <body>
-  <div class="frame">
-    <p class="eyebrow">Line · SRE Book · Figure 4-1</p>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · Figure 4-1</div>
     <h1>The average stays flat. The tail does not.</h1>
+    <p class="sub">Log-scale latency from 08:00 to 12:00. p50 stays near 50 ms. p99 spikes to 10 s after 10:30. An average of the same window would look unchanged.</p>
+  </header>
 
-    <svg viewBox="0 0 1040 560" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="latency-percentiles-title latency-percentiles-desc">
-      <title id="latency-percentiles-title">The average stays flat. The tail does not.</title>
-      <desc id="latency-percentiles-desc">Log-scale latency from 08:00 to 12:00. The 50th percentile stays near 50 ms while the 99th percentile spikes to 10 seconds after 10:30, which an average would hide.</desc>
-      <defs>
-        <marker id="arrow" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4f5d75"/></marker>
-        <marker id="arrow-accent" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#eb6c36"/></marker>
-        <marker id="arrow-link" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#2e5aa8"/></marker>
-      </defs>
+  <div class="stage">
+    <svg viewBox="0 0 1040 500" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="lp-title lp-desc">
+      <title id="lp-title">The average stays flat. The tail does not.</title>
+      <desc id="lp-desc">Log-scale latency from 08:00 to 12:00. The 50th percentile stays near 50 ms while the 99th percentile spikes to 10 seconds after 10:30, which an average would hide.</desc>
 
-      <rect width="100%" height="100%" fill="#f5f5f5"/>
+      <text transform="rotate(-90 28 230)" x="28" y="230" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" letter-spacing="0.12em" text-anchor="middle">LATENCY (MS) · LOG SCALE</text>
 
-      <text transform="rotate(-90 24 232)" x="24" y="232" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em" text-anchor="middle">LATENCY (MS) · LOG SCALE</text>
+      <line x1="80" y1="400" x2="880" y2="400" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="80" y1="310" x2="880" y2="310" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="80" y1="220" x2="880" y2="220" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="80" y1="130" x2="880" y2="130" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="80" y1="40"  x2="880" y2="40"  stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
 
-      <!-- Major log gridlines: 1, 10, 100, 1k, 10k -->
-      <line x1="80" y1="424" x2="880" y2="424" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
-      <line x1="80" y1="328" x2="880" y2="328" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
-      <line x1="80" y1="232" x2="880" y2="232" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
-      <line x1="80" y1="136" x2="880" y2="136" stroke="rgba(45,49,66,0.08)" stroke-width="0.8"/>
-      <line x1="80" y1="40"  x2="880" y2="40"  stroke="rgba(45,49,66,0.06)" stroke-width="0.8"/>
+      <line x1="80" y1="40" x2="80" y2="400" stroke="#2A3B55" stroke-width="1.4"/>
+      <line x1="80" y1="400" x2="880" y2="400" stroke="#2A3B55" stroke-width="1.4"/>
 
-      <!-- Axes -->
-      <line x1="80" y1="40" x2="80" y2="424" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
-      <line x1="80" y1="424" x2="880" y2="424" stroke="rgba(45,49,66,0.25)" stroke-width="1"/>
+      <text x="70" y="406" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">1</text>
+      <text x="70" y="316" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">10</text>
+      <text x="70" y="226" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">100</text>
+      <text x="70" y="136" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">1k</text>
+      <text x="70" y="46"  fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">10k</text>
 
-      <!-- Y-axis labels -->
-      <text x="72" y="428" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="end">1</text>
-      <text x="72" y="332" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="end">10</text>
-      <text x="72" y="236" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="end">100</text>
-      <text x="72" y="140" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="end">1k</text>
-      <text x="72" y="44"  fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="end">10k</text>
+      <polyline points="80,246 180,242 280,246 380,242 480,246 580,242 680,242 780,242 880,246"
+                fill="none" stroke="#8FA1BC" stroke-width="2" stroke-linejoin="round"/>
+      <polyline points="80,160 180,156 280,156 380,156 480,156 580,156 680,156 780,152 880,156"
+                fill="none" stroke="#5EEAD4" stroke-width="2" stroke-linejoin="round"/>
+      <polyline points="80,122 180,118 280,110 380,98 480,114 580,106 680,90 780,98 880,102"
+                fill="none" stroke="#F472B6" stroke-width="2" stroke-linejoin="round"/>
+      <polyline points="80,72 180,68 280,68 380,60 480,72 580,42 680,56 780,38 880,50"
+                fill="none" stroke="#FBBF24" stroke-width="2.8" stroke-linejoin="round"
+                style="filter:drop-shadow(0 0 6px rgba(251,191,36,0.45))"/>
+      <circle cx="80"  cy="72" r="4.5" fill="#FBBF24"/>
+      <circle cx="180" cy="68" r="4.5" fill="#FBBF24"/>
+      <circle cx="280" cy="68" r="4.5" fill="#FBBF24"/>
+      <circle cx="380" cy="60" r="4.5" fill="#FBBF24"/>
+      <circle cx="480" cy="72" r="4.5" fill="#FBBF24"/>
+      <circle cx="580" cy="42" r="4.5" fill="#FBBF24"/>
+      <circle cx="680" cy="56" r="4.5" fill="#FBBF24"/>
+      <circle cx="780" cy="38" r="4.5" fill="#FBBF24"/>
+      <circle cx="880" cy="50" r="4.5" fill="#FBBF24"/>
 
-      <!-- p50 series-1 sage -->
-      <polyline points="80,260 180,256 280,260 380,256 480,260 580,256 680,256 780,256 880,260"
-                fill="none" stroke="#7c8f6f" stroke-width="1.2" stroke-linejoin="round"/>
+      <text x="892" y="250" fill="#8FA1BC" font-size="16" font-weight="600" font-family="'JetBrains Mono', monospace">p50</text>
+      <text x="892" y="160" fill="#5EEAD4" font-size="16" font-weight="600" font-family="'JetBrains Mono', monospace">p85</text>
+      <text x="892" y="106" fill="#F472B6" font-size="16" font-weight="600" font-family="'JetBrains Mono', monospace">p95</text>
+      <text x="892" y="54"  fill="#FBBF24" font-size="16" font-weight="600" font-family="'JetBrains Mono', monospace">p99</text>
 
-      <!-- p85 series-2 dusty-blue -->
-      <polyline points="80,168 180,164 280,164 380,164 480,164 580,164 680,164 780,160 880,164"
-                fill="none" stroke="#5e7a9b" stroke-width="1.2" stroke-linejoin="round"/>
+      <text x="200" y="300" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">what an average reports</text>
+      <path d="M 280 292 Q 260 272 200 250" fill="none" stroke="rgba(231,237,246,0.35)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <circle cx="200" cy="242" r="2.5" fill="#E7EDF6"/>
 
-      <!-- p95 series-3 mustard -->
-      <polyline points="80,128 180,124 280,116 380,104 480,120 580,112 680,96 780,104 880,108"
-                fill="none" stroke="#b8915a" stroke-width="1.2" stroke-linejoin="round"/>
+      <text x="620" y="24" fill="#FBBF24" font-size="16" font-family="'Inter', sans-serif">tail hits 10s after 10:30</text>
+      <path d="M 720 28 Q 680 32 600 40" fill="none" stroke="rgba(251,191,36,0.50)" stroke-width="1.2" stroke-dasharray="4,3"/>
+      <circle cx="580" cy="42" r="2.5" fill="#FBBF24"/>
 
-      <!-- p99 FOCAL accent -->
-      <polyline points="80,76 180,72 280,72 380,64 480,76 580,44 680,60 780,40 880,52"
-                fill="none" stroke="#eb6c36" stroke-width="1.8" stroke-linejoin="round"/>
-      <circle cx="80"  cy="76" r="4" fill="#eb6c36"/>
-      <circle cx="180" cy="72" r="4" fill="#eb6c36"/>
-      <circle cx="280" cy="72" r="4" fill="#eb6c36"/>
-      <circle cx="380" cy="64" r="4" fill="#eb6c36"/>
-      <circle cx="480" cy="76" r="4" fill="#eb6c36"/>
-      <circle cx="580" cy="44" r="4" fill="#eb6c36"/>
-      <circle cx="680" cy="60" r="4" fill="#eb6c36"/>
-      <circle cx="780" cy="40" r="4" fill="#eb6c36"/>
-      <circle cx="880" cy="52" r="4" fill="#eb6c36"/>
-
-      <!-- End-of-line percentile labels -->
-      <rect x="888" y="248" width="44" height="16" rx="2" fill="#f5f5f5"/>
-      <text x="892" y="260" fill="#7c8f6f" font-size="12" font-weight="600" font-family="'Inter', sans-serif">p50</text>
-      <rect x="888" y="152" width="44" height="16" rx="2" fill="#f5f5f5"/>
-      <text x="892" y="164" fill="#5e7a9b" font-size="12" font-weight="600" font-family="'Inter', sans-serif">p85</text>
-      <rect x="888" y="96" width="44" height="16" rx="2" fill="#f5f5f5"/>
-      <text x="892" y="108" fill="#b8915a" font-size="12" font-weight="600" font-family="'Inter', sans-serif">p95</text>
-      <rect x="888" y="40" width="44" height="16" rx="2" fill="#f5f5f5"/>
-      <text x="892" y="52" fill="#eb6c36" font-size="12" font-weight="600" font-family="'Inter', sans-serif">p99</text>
-
-      <!-- Callout: average tracks p50 -->
-      <text x="200" y="320" fill="#2d3142" font-size="14" font-style="italic" font-family="'Inter', sans-serif">what an average reports</text>
-      <path d="M 280 312 Q 260 292 200 264" fill="none" stroke="rgba(45,49,66,0.40)" stroke-width="1" stroke-dasharray="4,3"/>
-      <circle cx="200" cy="256" r="2" fill="#2d3142"/>
-
-      <!-- Callout: tail spike -->
-      <text x="640" y="24" fill="#eb6c36" font-size="14" font-style="italic" font-family="'Inter', sans-serif">tail hits 10s after 10:30</text>
-      <path d="M 720 28 Q 680 32 600 40" fill="none" stroke="rgba(235,108,54,0.50)" stroke-width="1" stroke-dasharray="4,3"/>
-      <circle cx="580" cy="44" r="2" fill="#eb6c36"/>
-
-      <!-- X-axis labels -->
-      <text x="80"  y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">08:00</text>
-      <text x="180" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">08:30</text>
-      <text x="280" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">09:00</text>
-      <text x="380" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">09:30</text>
-      <text x="480" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">10:00</text>
-      <text x="580" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">10:30</text>
-      <text x="680" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">11:00</text>
-      <text x="780" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">11:30</text>
-      <text x="880" y="444" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" text-anchor="middle">12:00</text>
-
-      <!-- Legend -->
-      <line x1="40" y1="468" x2="1000" y2="468" stroke="rgba(45,49,66,0.10)" stroke-width="0.8"/>
-      <text x="40" y="488" fill="#4f5d75" font-size="8" font-family="'JetBrains Mono', monospace" letter-spacing="0.14em">LEGEND</text>
-
-      <rect x="40" y="508" width="16" height="8" fill="#7c8f6f"/>
-      <text x="64" y="516" fill="#4f5d75" font-size="8" font-family="'Inter', sans-serif">p50 · ~50 ms</text>
-
-      <rect x="200" y="508" width="16" height="8" fill="#5e7a9b"/>
-      <text x="224" y="516" fill="#4f5d75" font-size="8" font-family="'Inter', sans-serif">p85 · ~500 ms</text>
-
-      <rect x="380" y="508" width="16" height="8" fill="#b8915a"/>
-      <text x="404" y="516" fill="#4f5d75" font-size="8" font-family="'Inter', sans-serif">p95 · 1–2 s</text>
-
-      <rect x="540" y="508" width="16" height="8" fill="#eb6c36"/>
-      <text x="564" y="516" fill="#4f5d75" font-size="8" font-family="'Inter', sans-serif">p99 · 4–10 s · focal</text>
+      <text x="80"  y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">08:00</text>
+      <text x="180" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">08:30</text>
+      <text x="280" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">09:00</text>
+      <text x="380" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">09:30</text>
+      <text x="480" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">10:00</text>
+      <text x="580" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">10:30</text>
+      <text x="680" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">11:00</text>
+      <text x="780" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">11:30</text>
+      <text x="880" y="428" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">12:00</text>
     </svg>
+    <div class="legend">
+      <span><i class="swatch" style="background:#8FA1BC"></i>p50 · ~50 ms</span>
+      <span><i class="swatch" style="background:var(--req)"></i>p85 · ~500 ms</span>
+      <span><i class="swatch" style="background:var(--gslb)"></i>p95 · 1–2 s</span>
+      <span><i class="swatch" style="background:var(--res)"></i>p99 · 4–10 s</span>
+    </div>
   </div>
+
+  <footer>Redrawn from Figure 4-1 in <em>Site Reliability Engineering</em> (O'Reilly).</footer>
+</div>
 </body>
 </html>
