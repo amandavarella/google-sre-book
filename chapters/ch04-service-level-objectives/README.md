@@ -613,9 +613,19 @@ filter adds 80 ms to every click.
 The written promise is `99% of small Sets finish in under 50 ms`. 100 is bigger than 50.
 Most clicks would miss the promise.
 
-So you say wait. Or you ship the filter behind a flag, off for most users, until it is
-faster. The 50 ms line did the job: two teams disagreed, and the pre-agreed number picked
-the next step. That is all "win an argument" means. It is not about being louder. It is
+So you say wait. That does not mean "SRE, make today's 20 ms click faster." The 20 ms
+click already passes. The extra 80 ms is the problem.
+
+**Wait** means: do not turn the filter on for everyone this week. The people who built
+the filter (usually the product engineers) cut that 80 ms down. Example: they get it to
+25 ms. Then `20 + 25 = 45`, which is under 50, and you can ship.
+
+A **flag** is an on/off switch in the code. The filter can go to production switched
+off for most users. A small test group can try it while the 80 ms is being cut. Most
+users still get the 20 ms click, so the promise stays true.
+
+The 50 ms line did the job: two teams disagreed, and the pre-agreed number picked the
+next step. That is all "win an argument" means. It is not about being louder. It is
 about pointing at a number everyone already accepted.
 
 Now look at `CPU idle stays above 40%`. CPU idle is unused processor time. 40% idle means
