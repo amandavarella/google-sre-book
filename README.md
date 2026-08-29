@@ -62,23 +62,6 @@ or viewed live on GitHub Pages.
 Parts follow the book: **I. Introduction** (1–2) · **II. Principles** (3–9) ·
 **III. Practices** (10–27) · **IV. Management** (28–32) · **V. Conclusions** (33–34).
 
-## Interactive diagrams
-
-| Chapter | Diagram | View |
-| --- | --- | --- |
-| 2 | Life of a Request | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch02-production-environment/diagrams/life-of-a-request.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | SLI vs SLO | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Latency percentiles | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Mean vs median | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Same SLO, two shapes | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Two workload classes | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Error budget | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Choosing targets | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Control loop | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | SLOs set expectations | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Safety margin | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">open</a> |
-| 4 | Invest where | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">open</a> |
-
 ## Running locally
 
 The diagrams are plain HTML — open the file directly, or serve the repo:

@@ -58,7 +58,7 @@ Work on `main` in this checkout. Do not invent a branch/PR workflow unless asked
 
 ```
 index.html          GitHub Pages landing page: chapter index + featured diagrams
-README.md           same content for GitHub readers
+README.md           chapter index for GitHub readers (no diagram list)
 AGENTS.md           this file: conventions for agents
 chapters/chNN-slug/
   README.md         notes for that chapter
@@ -74,15 +74,16 @@ Do not keep a parallel copy in Obsidian.
 
 ## Adding a diagram
 
-A new diagram must be registered in three places by hand. Nothing generates these, and missing
+A new diagram must be registered in two places by hand. Nothing generates these, and missing
 one leaves the diagram unreachable from the site:
 
 1. `index.html` — an `<a class="feature">` card in the feature grid, **and** a
    `<span class="badge">N diagram</span>` on that chapter's row in the chapter list
-2. `README.md` — a row in the "Interactive diagrams" table
-3. the chapter's own `README.md` — a row in its diagrams table
+2. the chapter's own `README.md` — a row in its diagrams table
 
-Every diagram link in a README (root or chapter) must be the **live Pages URL**, never a
+Do **not** add a row to the root `README.md`. That file is a chapter index only.
+
+Every diagram link in a chapter README must be the **live Pages URL**, never a
 relative `diagrams/*.html` path and never a GitHub blob/source link:
 
 Use an HTML `<a>` with `target="_blank"` and `rel="noopener noreferrer"` so the diagram
