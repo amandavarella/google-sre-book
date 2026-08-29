@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Same SLO, two shapes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:720px; line-height:1.5;}
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:18px 14px 12px; margin-top:24px;
+  }
+  svg{width:100%; height:auto; display:block;}
+  .legend{
+    display:flex; gap:18px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:10px; padding:4px 8px 0; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · Defining objectives</div>
+    <h1>Same SLO, two shapes</h1>
+    <p class="sub">Both services pass <strong>99% of requests under 100 ms</strong>. Service A is instant for 90 people. Service B makes 90 people wait ~85 ms. One target cannot tell them apart. A stack of targets (90% &lt; 1 ms, 99% &lt; 10 ms, 99.9% &lt; 100 ms) can.</p>
+  </header>
+
+  <div class="stage">
+    <svg viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ss-title ss-desc">
+      <title id="ss-title">Same SLO, two shapes</title>
+      <desc id="ss-desc">Two bar charts of 100 requests. Service A piles 90 requests at 1 ms. Service B piles 90 requests at 85 ms. Both have 99 requests under 100 ms.</desc>
+
+      <!-- Service A -->
+      <text x="80" y="28" fill="#5EEAD4" font-size="16" font-family="'JetBrains Mono', monospace">SERVICE A · snappy typical</text>
+      <text x="28" y="200" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" transform="rotate(-90 28 200)" text-anchor="middle">REQUESTS</text>
+      <line x1="80" y1="50" x2="80" y2="300" stroke="#2A3B55" stroke-width="1.4"/>
+      <line x1="80" y1="300" x2="520" y2="300" stroke="#2A3B55" stroke-width="1.4"/>
+      <line x1="80" y1="50" x2="520" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+      <line x1="80" y1="133" x2="520" y2="133" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="80" y1="216" x2="520" y2="216" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="70" y="306" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">0</text>
+      <text x="70" y="222" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">30</text>
+      <text x="70" y="139" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">60</text>
+      <text x="70" y="56" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">90</text>
+
+      <!-- 100ms wall A: x = 80 + 100*4.2 = 500 -->
+      <line x1="500" y1="50" x2="500" y2="300" stroke="#FBBF24" stroke-width="1.4" stroke-dasharray="4,3"/>
+      <text x="500" y="44" fill="#FBBF24" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">100 ms SLO</text>
+
+      <!-- A: 90 @ 1ms, x=80+4.2=84.2, bar 80-108 -->
+      <rect x="82" y="50" width="28" height="250" fill="rgba(94,234,212,0.18)" stroke="#5EEAD4" stroke-width="1.6"/>
+      <text x="96" y="44" fill="#5EEAD4" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">90</text>
+      <text x="96" y="322" fill="#E7EDF6" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">1 ms</text>
+
+      <!-- A: 9 @ 8ms, x=80+33.6=113.6 -->
+      <rect x="114" y="275" width="28" height="25" fill="rgba(94,234,212,0.18)" stroke="#5EEAD4" stroke-width="1.6"/>
+      <text x="128" y="270" fill="#5EEAD4" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">9</text>
+      <text x="138" y="322" fill="#E7EDF6" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">8 ms</text>
+
+      <!-- A: 1 @ 90ms, x=80+378=458 -->
+      <rect x="446" y="297" width="28" height="3" fill="rgba(94,234,212,0.18)" stroke="#5EEAD4" stroke-width="1.6"/>
+      <text x="460" y="292" fill="#5EEAD4" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">1</text>
+      <text x="460" y="322" fill="#E7EDF6" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">90 ms</text>
+
+      <text x="80" y="352" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">p90 = 1 ms. 99 requests finish under 100 ms. Users feel this as instant.</text>
+
+      <!-- Service B -->
+      <text x="580" y="28" fill="#F472B6" font-size="16" font-family="'JetBrains Mono', monospace">SERVICE B · slow typical</text>
+      <line x1="580" y1="50" x2="580" y2="300" stroke="#2A3B55" stroke-width="1.4"/>
+      <line x1="580" y1="300" x2="1020" y2="300" stroke="#2A3B55" stroke-width="1.4"/>
+      <line x1="580" y1="50" x2="1020" y2="50" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+      <line x1="580" y1="133" x2="1020" y2="133" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <line x1="580" y1="216" x2="1020" y2="216" stroke="rgba(255,255,255,0.06)" stroke-width="1"/>
+      <text x="570" y="306" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">0</text>
+      <text x="570" y="222" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">30</text>
+      <text x="570" y="139" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">60</text>
+      <text x="570" y="56" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="end">90</text>
+
+      <!-- 100ms wall B: x = 580 + 420 = 1000 -->
+      <line x1="1000" y1="50" x2="1000" y2="300" stroke="#FBBF24" stroke-width="1.4" stroke-dasharray="4,3"/>
+      <text x="1000" y="44" fill="#FBBF24" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">100 ms SLO</text>
+
+      <!-- B: 90 @ 85ms, x=580+357=937 -->
+      <rect x="924" y="50" width="28" height="250" fill="rgba(244,114,182,0.16)" stroke="#F472B6" stroke-width="1.6"/>
+      <text x="938" y="44" fill="#F472B6" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">90</text>
+      <text x="928" y="322" fill="#E7EDF6" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">85 ms</text>
+
+      <!-- B: 9 @ 95ms -->
+      <rect x="960" y="275" width="22" height="25" fill="rgba(244,114,182,0.16)" stroke="#F472B6" stroke-width="1.6"/>
+      <text x="971" y="270" fill="#F472B6" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">9</text>
+      <text x="980" y="340" fill="#E7EDF6" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">95</text>
+
+      <!-- B: 1 @ 99ms, just left of wall -->
+      <rect x="988" y="297" width="10" height="3" fill="rgba(244,114,182,0.16)" stroke="#F472B6" stroke-width="1.6"/>
+      <text x="1008" y="322" fill="#E7EDF6" font-size="13" font-family="'JetBrains Mono', monospace">99 ms</text>
+
+      <text x="580" y="352" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">p90 = 85 ms. Also 99 under 100 ms. Users feel this as slow every time.</text>
+
+      <!-- Bottom comparison -->
+      <rect x="80" y="390" width="440" height="110" rx="8" fill="#0F1A2B" stroke="#26374F"/>
+      <rect x="580" y="390" width="440" height="110" rx="8" fill="#0F1A2B" stroke="#26374F"/>
+      <text x="96" y="418" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">A vs a stack of SLOs</text>
+      <text x="96" y="444" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">90% &lt; 1 ms · pass</text>
+      <text x="96" y="466" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99% &lt; 10 ms · fail (the 90 ms request)</text>
+      <text x="96" y="488" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99% &lt; 100 ms · pass</text>
+
+      <text x="596" y="418" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">B vs a stack of SLOs</text>
+      <text x="596" y="444" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">90% &lt; 1 ms · fail</text>
+      <text x="596" y="466" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99% &lt; 10 ms · fail</text>
+      <text x="596" y="488" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99% &lt; 100 ms · pass</text>
+    </svg>
+    <div class="legend">
+      <span><i class="swatch" style="background:var(--req)"></i>Service A</span>
+      <span><i class="swatch" style="background:var(--gslb)"></i>Service B</span>
+      <span><i class="swatch" style="background:var(--res)"></i>The one SLO both pass</span>
+    </div>
+  </div>
+
+  <footer>Worked example for Chapter 4, Defining Objectives.</footer>
+</div>
+</body>
+</html>

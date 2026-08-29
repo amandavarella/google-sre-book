@@ -357,6 +357,72 @@ dashboard already has, the SLOs will be weaker. Working backward from the object
 then picking indicators that support it, works better than picking indicators first and inventing
 targets later.
 
+#### Defining Objectives
+
+Write the SLO so a stranger can measure it the same way you do. Say *what* is measured and
+*under which rules* it counts.
+
+You do not have to repeat those rules in every SLO. The SLI template from the previous section
+already holds them. That is why these two lines mean the same thing:
+
+- Long: `99% (averaged over 1 minute) of Get RPC calls will complete in less than 100 ms
+  (measured across all the backend servers).`
+- Short: `99% of Get RPC calls will complete in less than 100 ms.`
+
+The parentheses are not extra flavour. They are the house defaults (1-minute window, all backend
+servers). Once the team agrees those defaults, the short line is enough. Anyone who needs the
+missing details looks them up in the template.
+
+**Why the second line is not a weaker promise**
+
+Think of the template as a filled-in form. The long line writes every box. The short line writes
+only the boxes that change (99%, Get RPC, 100 ms). The other boxes stay as they were. If you
+changed a default (measure at the client, or average over 1 hour), you would say so. Silence
+means "use the template."
+
+**Why one target is not always enough: the shape of the curve**
+
+A single SLO pins *one point* on the latency distribution (the set of all request times, from
+fastest to slowest). Many different shapes can pass that one point.
+
+Both services below meet `99% of Get RPCs finish in under 100 ms`. Users do not experience them
+as the same product.
+
+| | Service A (snappy typical) | Service B (slow typical) |
+|---|---|---|
+| 90 requests | 1 ms | 85 ms |
+| 9 requests | 8 ms | 95 ms |
+| 1 request | 90 ms | 99 ms |
+| p90 | 1 ms | 85 ms |
+| p99 | 90 ms | 99 ms |
+| Passes `99% < 100 ms`? | yes | yes |
+| Feels instant for most people? | yes | no |
+
+Shape is important when the *typical* request and the *tail* request are different product
+promises:
+
+- **Search / a checkout button.** Most clicks must feel instant (p90 near 1 ms or a few tens of
+  ms). A long tail is still bad, but a service that is "fine at p99 and sluggish at p90" trains
+  every user to wait. One SLO at 100 ms hides that.
+- **A batch report.** Users will wait seconds. You care that almost nothing exceeds a deadline
+  (p99 / p99.9). Pinning p90 to 1 ms would waste money on hardware nobody can feel.
+- **Two user populations.** Mobile clients on slow networks vs an internal admin tool on the
+  same API. One 100 ms SLO is a compromise that fits neither. Two targets (or two SLOs) make
+  the two humps visible.
+- **A regression that "still passes."** Engineers add work to the common path. p90 moves from
+  1 ms to 80 ms. p99 stays under 100 ms. A single SLO stays green. Three targets would fail
+  the 90% / 1 ms line and page you.
+
+That is why the book offers a *stack* of SLOs when shape matters:
+
+- `90% of Get RPC calls will complete in less than 1 ms.`
+- `99% of Get RPC calls will complete in less than 10 ms.`
+- `99.9% of Get RPC calls will complete in less than 100 ms.`
+
+Together they say: most requests are tiny, almost all are still small, and only a thin tail may
+reach 100 ms. Service B above would fail the first two lines. See
+[Same SLO, two shapes](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html).
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -372,6 +438,11 @@ targets later.
   too rarely if timeouts hide the real hangs.
 - Start from what users care about, then work backward to indicators, even if you have to
   approximate. Starting from what's easy to measure produces weaker SLOs.
+- A short SLO can omit the measurement rules once those rules live in the SLI template. The
+  short line is not a weaker promise.
+- One SLO pins one point on the distribution. Many shapes can pass `99% < 100 ms`. Stack
+  several targets (p90 / p99 / p99.9) when the typical request and the tail are both part of
+  the product promise.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -396,6 +467,7 @@ targets later.
 | --- | --- |
 | **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html) |
 | **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html) |
+| **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one feels instant | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html) |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
