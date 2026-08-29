@@ -159,6 +159,39 @@
           <text x="60" y="322" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">Same meeting, second number. It did not change wait. Keep it as a graph. Do not make it an SLO.</text>
         </g>
 
+        <g id="lever" class="layer">
+          <rect x="40" y="28" width="320" height="300" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="60" y="58" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">TOO TIGHT</text>
+          <text x="60" y="92" fill="#E7EDF6" font-size="18" font-family="'JetBrains Mono', monospace">99% under 10 ms</text>
+          <text x="60" y="128" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">Only true if two people</text>
+          <text x="60" y="150" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">restart workers at 02:00.</text>
+          <text x="60" y="184" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif">Team: heroic overtime,</text>
+          <text x="60" y="206" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif">or a redesign you may</text>
+          <text x="60" y="228" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif">not need.</text>
+          <text x="60" y="264" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Users did not ask for</text>
+          <text x="60" y="286" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">that cost. Wasted work.</text>
+
+          <rect x="390" y="28" width="320" height="300" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="410" y="58" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">JUST ENOUGH</text>
+          <text x="410" y="92" fill="#E7EDF6" font-size="18" font-family="'JetBrains Mono', monospace">99% under 50 ms</text>
+          <text x="410" y="128" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">The Friday line. 100 ms</text>
+          <text x="410" y="150" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">would miss, so you wait.</text>
+          <text x="410" y="184" fill="#5EEAD4" font-size="14" font-family="'Inter', sans-serif">Team: cut the extra 80 ms.</text>
+          <text x="410" y="206" fill="#5EEAD4" font-size="14" font-family="'Inter', sans-serif">Do not chase the 20 ms.</text>
+          <text x="410" y="264" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Users get clicks they</text>
+          <text x="410" y="286" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">already accept.</text>
+
+          <rect x="740" y="28" width="320" height="300" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="760" y="58" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">TOO LOOSE</text>
+          <text x="760" y="92" fill="#E7EDF6" font-size="18" font-family="'JetBrains Mono', monospace">99% under 200 ms</text>
+          <text x="760" y="128" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">The filter ships. 100 ms</text>
+          <text x="760" y="150" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">still "passes." No alert.</text>
+          <text x="760" y="184" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif">Team: no one is forced</text>
+          <text x="760" y="206" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif">to cut the 80 ms.</text>
+          <text x="760" y="264" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Almost every click is</text>
+          <text x="760" y="286" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">slow. SLO stays green.</text>
+        </g>
+
         <g id="delight" class="layer">
           <rect x="40" y="28" width="1020" height="160" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
           <text x="60" y="64" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">USER DELIGHT IS NOT AN SLO</text>
@@ -177,7 +210,7 @@
 
     <div class="side">
       <div class="card">
-        <div class="step-tag" id="stepTag">Step 1 of 5</div>
+        <div class="step-tag" id="stepTag">Step 1 of 6</div>
         <div class="step-title" id="stepTitle"></div>
         <div class="step-desc" id="stepDesc"></div>
         <div class="controls">
@@ -219,6 +252,11 @@ const steps = [
     title: 'User delight is not an SLO',
     desc: 'Delight has no shared ruler. Two people will not agree that "delight is 80." You cannot send an on-call alert (page you) for "less delighted." Keep delight as a product goal. Put an SLO on the pieces you can count: the click was fast, the write stayed.',
     on: ['delight']
+  },
+  {
+    title: 'The SLO is a lever. Set it on purpose.',
+    desc: 'A forcing function is a written rule that picks ship or wait when people disagree. Too tight (10 ms plus night restarts) wastes heroic work. Just enough (50 ms) sends work to the extra 80 ms. Too loose (200 ms) lets the filter ship. Almost every click is slow. The SLO stays green.',
+    on: ['lever']
   }
 ];
 
@@ -226,7 +264,7 @@ let current = 0;
 let playing = false;
 let playTimer = null;
 
-const ids = ['dash','copy','reflect','meet','delight'];
+const ids = ['dash','copy','reflect','meet','delight','lever'];
 const els = {};
 ids.forEach(id => { els[id] = document.getElementById(id); });
 

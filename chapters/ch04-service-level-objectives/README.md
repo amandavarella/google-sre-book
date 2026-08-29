@@ -655,8 +655,32 @@ Two people will not agree that "delight is 80." You cannot send an on-call alert
 (page you) for "less delighted." Keep delight as a product goal. Put an SLO on the pieces
 you can count: the click was fast, the write stayed.
 
+**A good SLO moves the work. A bad one wastes it, or lets the product rot.**
+
+SLOs should set the order of work for both SRE and product engineers. They name what users
+care about (the click was fast, the write stayed). Then the team does the work that keeps
+those lines true, and waits on work that would break them. The Friday filter meeting is
+that in action.
+
+A **forcing function** is a written rule that makes a decision happen when people disagree.
+The 50 ms line forced WAIT. Nobody had to "win" by being louder. That is a *helpful*
+forcing function: it pointed at a real user cost (100 ms clicks).
+
+The same lever cuts both ways. A **lever** here means a small change to the SLO number
+moves a lot of people and a lot of weeks.
+
+| SLO you write | What the team does | What users get |
+|---|---|---|
+| Too tight: `99% under 10 ms` (only true if two people restart workers at 02:00) | Heroic overtime, forever, or a huge redesign you may not need | 10 ms, at a cost users did not ask for. Wasted work. |
+| Just enough: `99% under 50 ms` | Filter waits until `20 + extra` stays under 50 | Clicks users already accept. Work goes to the 80 ms, not to the 20 ms. |
+| Too loose: `99% under 200 ms` | The filter ships this week. 100 ms still "passes." No one is paged. | Almost every click is slow. The product is worse. The SLO stays green. |
+
+Use the lever on purpose. Pick the number by what users need, not by tonight's dashboard,
+and not by a number so soft that a bad ship still looks healthy.
+
 See
-<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>.
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>
+(last step).
 
 ## Key takeaways
 
@@ -688,7 +712,9 @@ See
   merits and limits. Publishing that number without reflection locks in today's architecture
   and any heroic effort that produced it. Keep as few SLOs as you can defend: if a line has
   never changed a "ship or wait" decision, drop it from the SLO list. "User delight" is not
-  an SLO. It has no shared number.
+  an SLO. It has no shared number. A good SLO is a forcing function: it picks ship or wait
+  when people disagree. Too tight wastes heroic work. Too loose lets a slow product stay
+  green.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -718,7 +744,7 @@ See
 | **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Two workload classes**: same `Set` RPC; pipeline 95% under 1 s, small clicks 99% under 10 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Error budget**: 99.9% succeed means 1 of 1,000 may fail; that leftover is the spend you track | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Open</a> |
-| **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that change a ship-or-wait decision | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that change ship or wait; last step is the lever (too tight, just enough, too loose) | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
