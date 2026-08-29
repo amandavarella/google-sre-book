@@ -85,6 +85,9 @@ one leaves the diagram unreachable from the site:
 Every diagram link in a README (root or chapter) must be the **live Pages URL**, never a
 relative `diagrams/*.html` path and never a GitHub blob/source link:
 
+Use an HTML `<a>` with `target="_blank"` and `rel="noopener noreferrer"` so the diagram
+opens in a new tab. Plain markdown `[text](url)` stays in the same tab.
+
 `https://amandavarella.github.io/google-sre-book/chapters/chNN-slug/diagrams/<file>.html`
 
 Chapter rows in `index.html` deliberately link to the GitHub blob URL, not a relative path:

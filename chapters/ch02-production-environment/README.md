@@ -10,7 +10,7 @@
 
 | Diagram | Open |
 | --- | --- |
-| **Life of a Request**: a step-through of Figure 2-4, redrawn to put the browser in the middle and to show the response path the original leaves out | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch02-production-environment/diagrams/life-of-a-request.html) |
+| **Life of a Request**: a step-through of Figure 2-4, redrawn to put the browser in the middle and to show the response path the original leaves out | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch02-production-environment/diagrams/life-of-a-request.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 ### Diagram walkthrough
 

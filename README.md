@@ -66,10 +66,10 @@ Parts follow the book: **I. Introduction** (1–2) · **II. Principles** (3–9)
 
 | Chapter | Diagram | View |
 | --- | --- | --- |
-| 2 | Life of a Request | [open](https://amandavarella.github.io/google-sre-book/chapters/ch02-production-environment/diagrams/life-of-a-request.html) |
-| 4 | Latency percentiles | [open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html) |
-| 4 | Mean vs median | [open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html) |
-| 4 | Same SLO, two shapes | [open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html) |
+| 2 | Life of a Request | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch02-production-environment/diagrams/life-of-a-request.html" target="_blank" rel="noopener noreferrer">open</a> |
+| 4 | Latency percentiles | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">open</a> |
+| 4 | Mean vs median | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">open</a> |
+| 4 | Same SLO, two shapes | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">open</a> |
 
 ## Running locally
 

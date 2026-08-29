@@ -147,7 +147,7 @@ Aggregate raw measurements carefully. Most metrics are distributions, not averag
   hides those tail latencies, and hides changes in them.
 - Figure 4-1: a typical request is served in about 50 ms, but 5% of requests are 20 times slower.
   If you monitor and alert only on average latency, the day looks unchanged, even while the tail
-  (p95 or p99) is moving a lot. See [Latency percentiles](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html).
+  (p95 or p99) is moving a lot. See <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">Latency percentiles</a>.
 
 ##### A Note on Statistical Fallacies
 
@@ -219,7 +219,7 @@ The left side is chopped too: nothing can finish in less than 0 ms. Together, fl
 ceiling at the timeout are why this is not a bell curve, and why mean and median need not be
 close.
 
-See the six-step walkthrough: [Mean vs median](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html).
+See the six-step walkthrough: <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Mean vs median</a>.
 
 **Why this breaks "restart on outlier" automation**
 
@@ -452,7 +452,7 @@ That is why the book offers a *stack* of SLOs when shape matters:
 
 Together they say: most requests finish in about 1 ms, almost all still finish in 10 ms, and
 only a few may take as long as 100 ms. Service B above would miss the first two lines. See
-[Same SLO, two shapes](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html).
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Same SLO, two shapes</a>.
 
 ## Key takeaways
 
@@ -498,9 +498,9 @@ only a few may take as long as 100 ms. Service B above would miss the first two 
 
 | Diagram | Open |
 | --- | --- |
-| **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html) |
-| **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html) |
-| **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | [Open](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html) |
+| **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
