@@ -100,14 +100,14 @@
   <header>
     <div class="eyebrow">Google SRE Workbook · Choosing targets</div>
     <h1>Choosing targets</h1>
-    <p class="sub">Measure what the system does today. Do not publish that number as the SLO. Keep only the SLOs that can win a priority argument.</p>
+    <p class="sub">Measure what the system does today. Do not publish that number as the SLO. Keep a line as an SLO only if people use that number to decide ship or wait.</p>
   </header>
 
   <div class="layout">
     <div class="stage">
       <svg viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="ct-title ct-desc">
         <title id="ct-title">Choosing targets</title>
-        <desc id="ct-desc">Today p99 is 10 milliseconds because two people restart workers at night. Copying 10 milliseconds as the SLO locks those heroes in. Reflecting first sets 50 milliseconds, which users already accept. Then only keep SLOs that win an argument.</desc>
+        <desc id="ct-desc">Today p99 is 10 milliseconds because two people restart workers at night. Copying 10 milliseconds as the SLO locks those heroes in. Reflecting first sets 50 milliseconds, which users already accept. Then only keep an SLO if people use that number to decide ship or wait.</desc>
 
         <!-- Dashboard: always useful -->
         <g id="dash" class="layer">
@@ -136,24 +136,40 @@
           <text x="60" y="294" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">Users are already happy at 50 ms. Write 99% under 50 ms. Night restarts can stop. The 10 ms fact stays a merit, not a contract.</text>
         </g>
 
-        <g id="few" class="layer">
-          <rect x="40" y="348" width="500" height="140" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
-          <text x="60" y="378" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">KEEP · WINS AN ARGUMENT</text>
-          <text x="60" y="408" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99% of small Sets under 50 ms</text>
-          <text x="60" y="430" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">99.9% of Sets succeed</text>
-          <text x="60" y="452" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">"The photo filter adds 80 ms. Wait."</text>
-          <rect x="560" y="348" width="500" height="140" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
-          <text x="580" y="378" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">DROP · NEVER QUOTED</text>
-          <text x="580" y="408" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">CPU idle above 40%</text>
-          <text x="580" y="430" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">User delight above 80%</text>
-          <text x="580" y="452" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">No shared number. Cannot page on-call.</text>
+        <g id="meet" class="layer">
+          <rect x="40" y="28" width="500" height="200" rx="10" fill="#0F1A2B" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="60" y="58" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">FRIDAY MEETING</text>
+          <text x="60" y="90" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">Product: ship the photo filter this week.</text>
+          <text x="60" y="118" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Today a click is about 20 ms.</text>
+          <text x="60" y="142" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">The filter adds 80 ms to every click.</text>
+          <text x="60" y="178" fill="#E7EDF6" font-size="20" font-family="'JetBrains Mono', monospace">20 + 80 = 100 ms</text>
+          <text x="60" y="206" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Most clicks would now take 100 ms.</text>
+
+          <rect x="560" y="28" width="500" height="200" rx="10" fill="#16283F" stroke="#5EEAD4" stroke-width="1.6"/>
+          <text x="580" y="58" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">THE WRITTEN PROMISE</text>
+          <text x="580" y="96" fill="#E7EDF6" font-size="20" font-family="'JetBrains Mono', monospace">99% under 50 ms</text>
+          <text x="580" y="130" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">100 is bigger than 50. The promise would miss.</text>
+          <text x="580" y="168" fill="#5EEAD4" font-size="18" font-family="'JetBrains Mono', monospace">DECISION: WAIT</text>
+          <text x="580" y="196" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif">Or ship behind a flag, off for most users.</text>
+
+          <rect x="40" y="248" width="1020" height="72" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="60" y="278" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">NOT USED IN THIS MEETING</text>
+          <text x="60" y="304" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">CPU idle is 55% (machines are busy only 45% of the time). Nobody used that number to say ship or wait. Keep the graph. It is not an SLO.</text>
+        </g>
+
+        <g id="delight" class="layer">
+          <rect x="40" y="28" width="1020" height="160" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="60" y="64" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">USER DELIGHT IS NOT AN SLO</text>
+          <text x="60" y="100" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">There is no shared ruler. Two people will not agree that "delight is 80."</text>
+          <text x="60" y="128" fill="#E7EDF6" font-size="16" font-family="'Inter', sans-serif">You cannot send an on-call alert for "less delighted." Keep it as a product goal.</text>
+          <text x="60" y="160" fill="#8FA1BC" font-size="15" font-family="'Inter', sans-serif">Put an SLO on what you can count: the click was fast, the write stayed.</text>
         </g>
       </svg>
       <div class="legend">
         <span><i class="swatch" style="background:var(--req)"></i>measure, then reflect</span>
         <span><i class="swatch" style="background:var(--res)"></i>heroic effort (night restarts)</span>
         <span><i class="swatch" style="background:var(--gslb); height:0; border-top:2px dashed var(--gslb); width:18px;"></i>copy without reflection</span>
-        <span><i class="swatch" style="background:var(--gslb)"></i>a line you never quote</span>
+        <span><i class="swatch" style="background:var(--gslb)"></i>a number nobody used to decide</span>
       </div>
     </div>
 
@@ -193,14 +209,14 @@ const steps = [
     on: ['dash', 'reflect']
   },
   {
-    title: 'Keep only SLOs that win an argument',
-    desc: 'Should we ship the photo filter this week? It adds 80 ms to every click. The 50 ms click SLO lets you say wait. A CPU-idle line has never delayed a launch. Drop it. Fewer SLOs means the ones you keep get watched.',
-    on: ['few']
+    title: 'Keep an SLO if it changes ship or wait',
+    desc: 'Today a click is about 20 ms. The filter adds 80 ms. That is 100 ms. The promise is 99% under 50 ms. 100 is bigger than 50, so you wait. The 50 ms line picked the next step. CPU idle is 55% this week. Nobody used that number. Keep the graph. It is not an SLO.',
+    on: ['meet']
   },
   {
     title: 'User delight is not an SLO',
-    desc: 'Two people will not agree on a number for delight. You cannot send an on-call alert for "less delighted." Keep delight as a product goal. Put an SLO on the pieces you can count: the click was fast, the write stayed.',
-    on: ['few']
+    desc: 'Delight has no shared ruler. Two people will not agree that "delight is 80." You cannot send an on-call alert (page you) for "less delighted." Keep delight as a product goal. Put an SLO on the pieces you can count: the click was fast, the write stayed.',
+    on: ['delight']
   }
 ];
 
@@ -208,7 +224,7 @@ let current = 0;
 let playing = false;
 let playTimer = null;
 
-const ids = ['dash','copy','reflect','few'];
+const ids = ['dash','copy','reflect','meet','delight'];
 const els = {};
 ids.forEach(id => { els[id] = document.getElementById(id); });
 

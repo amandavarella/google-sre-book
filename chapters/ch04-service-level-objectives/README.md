@@ -599,18 +599,34 @@ A later redesign that aims for 1 ms is "extra," because the SLO is already green
 Pick just enough to cover the attributes users notice: usually availability, latency, and
 maybe durability or freshness. Each extra SLO is another graph nobody watches.
 
-**The conversation test.** Keep an SLO only if you can win a priority argument by quoting it.
+**The meeting test.** An SLO earns its place if people use that number to decide "ship this
+week, or wait." If a line has never changed a launch decision, it is not an SLO. You can
+still put it on a dashboard.
 
-- Keep: `99% of small Sets finish in under 50 ms.` "Should we ship the new photo filter this
-  week?" The filter adds 80 ms to every click. You can say wait, or ship it behind a flag.
-  The SLO did work.
-- Drop: `CPU idle stays above 40%.` Nobody has ever delayed a launch by quoting that line.
-  It is a capacity hint, not a user promise.
+Walk through one Friday meeting.
 
-Not every product wish can be an SLO. **User delight** has no shared measurement. Two people
-will not agree on a number, and you cannot page on-call for "less delighted." Keep delight
-as a product goal. Put an SLO on the pieces you can count (the click was fast, the write
-stayed).
+Today each click takes about 20 ms. Product wants to ship a photo filter this week. The
+filter adds 80 ms to every click.
+
+`20 ms + 80 ms = 100 ms` per click after the filter.
+
+The written promise is `99% of small Sets finish in under 50 ms`. 100 is bigger than 50.
+Most clicks would miss the promise.
+
+So you say wait. Or you ship the filter behind a flag, off for most users, until it is
+faster. The 50 ms line did the job: two teams disagreed, and the pre-agreed number picked
+the next step. That is all "win an argument" means. It is not about being louder. It is
+about pointing at a number everyone already accepted.
+
+Now look at `CPU idle stays above 40%`. CPU idle is unused processor time. 40% idle means
+the machines are busy only 60% of the time. Useful for capacity planning. In this meeting
+nobody said "the filter is fine, idle is 55%." The launch did not move because of that
+line. So it is not an SLO. Keep the graph. Drop it from the SLO list.
+
+**User delight** fails the same test for a different reason. Delight has no shared ruler.
+Two people will not agree that "delight is 80." You cannot send an on-call alert
+(page you) for "less delighted." Keep delight as a product goal. Put an SLO on the pieces
+you can count: the click was fast, the write stayed.
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>.
@@ -643,8 +659,9 @@ See
   is itself an SLO on the other SLOs.
 - Do not copy today's dashboard number as the SLO. Measure current performance to learn
   merits and limits. Publishing that number without reflection locks in today's architecture
-  and any heroic effort that produced it. Keep as few SLOs as you can defend: if a line never
-  wins a priority argument, drop it. "User delight" is not an SLO.
+  and any heroic effort that produced it. Keep as few SLOs as you can defend: if a line has
+  never changed a "ship or wait" decision, drop it from the SLO list. "User delight" is not
+  an SLO. It has no shared number.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -674,7 +691,7 @@ See
 | **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Two workload classes**: same `Set` RPC; pipeline 95% under 1 s, small clicks 99% under 10 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Error budget**: 99.9% succeed means 1 of 1,000 may fail; that leftover is the spend you track | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Open</a> |
-| **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that win an argument | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that change a ship-or-wait decision | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
