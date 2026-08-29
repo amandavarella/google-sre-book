@@ -401,9 +401,12 @@ as the same product.
 Shape is important when the *typical* request and the *tail* request are different product
 promises:
 
-- **Search / a checkout button.** Most clicks must feel instant (p90 near 1 ms or a few tens of
-  ms). A long tail is still bad, but a service that is "fine at p99 and sluggish at p90" trains
-  every user to wait. One SLO at 100 ms hides that.
+- **Search / a checkout button.** p90 is the time 90 of 100 requests beat. That is what most
+  people feel when they click. p99 is the time 99 of 100 beat. That is the unlucky 1%. If p99
+  is under 100 ms (the SLO is green) but p90 is already 85 ms, almost every click is slow.
+  Users do not meet the fast 1%. They meet the slow 90. The product feels slow to everyone,
+  not only to the tail. One SLO at 100 ms cannot see this, because both the 85 ms clicks and
+  the 99 ms click still pass.
 - **A batch report.** Users will wait seconds. You care that almost nothing exceeds a deadline
   (p99 / p99.9). Pinning p90 to 1 ms would waste money on hardware nobody can feel.
 - **Two user populations.** Mobile clients on slow networks vs an internal admin tool on the

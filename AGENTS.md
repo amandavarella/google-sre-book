@@ -29,6 +29,11 @@ English is a second language. Write so a careful reader can study without decodi
 - Prefer concrete numbers and the same example across a walkthrough (for example the 100-request
   latency set) over abstract restatement.
 - Never use em dashes. Use a comma, colon, or a new sentence.
+- **Anticipate the next question.** If a sentence packs two ideas (for example "fine at p99 and
+  sluggish at p90"), unpack it before she has to ask: say what p90 / p99 *are*, then say who
+  feels each one, then say why that matters. Do not use a metaphor ("trains users to wait")
+  when a number will do. When she asks "I don't get X", rewrite X in the notes that same way,
+  and treat the question as a style bug to avoid next time.
 
 ## Commands
 
