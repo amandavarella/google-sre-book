@@ -420,10 +420,13 @@ promises:
   Example: 1,000 reports must be in inboxes by 08:00. 999 finish by 07:50. One finishes at
   10:00. p99 is still about 07:50 (only 1 in 100 is allowed to be later, and you have only 1
   late job in 1,000). p99.9 is 10:00: that is the one job that missed the meeting. If "almost
-  nothing may be late" is the promise, p99.9 is the number you set a deadline on. Making the
-  999 on-time reports finish at 07:49 instead of 07:50 does not move the 10:00 report. The
-  meeting still misses that one file. Extra hardware for p90 = 1 ms does not fix the SLO you
-  actually set.
+  nothing may be late" is the promise, p99.9 is the number you set a deadline on.
+
+  Why more machines for p90 = 1 ms do not fix that SLO: the SLO you set is p99.9 (in by
+  08:00). p90 is already a pass. 999 reports are in at 07:50. Buying CPUs so those 999 finish
+  in 1 ms changes p90 only. It does not change p99.9. The 10:00 job is late for a different
+  reason (a stuck worker, a huge file, a lock). Making the other 999 faster does not finish
+  that job. The meeting still misses that one file. The SLO you set is still missed.
 - **Two user populations.** The same API serves phones on slow networks and an internal admin
   tool on a fast office network. Phone requests cluster around a slower time. Admin requests
   cluster around a faster time. One 100 ms SLO is a compromise that fits neither group. Two
