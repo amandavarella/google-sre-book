@@ -79,24 +79,13 @@ Number = 99.9%. The SLO is `at least 99.9% of well-formed write requests succeed
 The SLI can be green or red only after you attach an SLO. A dashboard that says "success
 rate is 99.7%" is an SLI reading. It is not a miss until someone wrote "we promised 99.9%."
 
-**Paired examples** (same row = one relationship)
-
-| What users care about | SLI (what you count) | SLO (the promise) |
-|---|---|---|
-| Did the write work? | Share of well-formed write requests that succeed (the server did not fail) | At least 99.9% succeed |
-| Was the click fast? | Time from click to last byte, for small writes | 99 of 100 finish in 50 ms or less |
-| Did the nightly report arrive? | Time from job start to the file in the inbox | 999 of 1,000 finish by 08:00 |
-| Is the photo still there next year? | Share of written objects that still read back with a matching checksum | At least 99.99% still readable after 365 days |
-
-One SLI can feed more than one SLO. Same write-latency measurement. Pipeline promise: 95 of
-100 finish in 1 s or less. Click promise: 99 of 100 small writes finish in 10 ms or less.
-Two marks on the same ruler.
-
-Some SLIs never get an SLO. Incoming requests per second is a real measurement. Users choose
-that number, so you do not promise "we will receive 10,000 QPS." You still watch the graph.
+One SLI can feed more than one SLO (two marks on the same ruler). Some SLIs never get an
+SLO: incoming QPS is a real measurement, but users choose that number, so you do not
+promise it.
 
 See
-<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">SLI vs SLO</a>.
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">SLI vs SLO</a>
+(pairs, then one ruler with two marks).
 
 ### The Global Chubby Planned Outage
 
@@ -195,132 +184,17 @@ Aggregate raw measurements carefully. Most metrics are distributions, not averag
 
 #### A Note on Statistical Fallacies
 
-Percentiles are usually more useful than the arithmetic mean (the average). They show the long
-tail, which often behaves differently from the middle of the data. Computer systems produce
-skewed, bounded numbers: a request cannot finish in less than 0 ms, and a 1,000 ms timeout means
-no successful response can be slower than that. So the mean and the median need not be the same,
-or even close.
+Percentiles are usually more useful than the mean. They show the long tail. Computer systems
+chop that tail: nothing finishes in less than 0 ms, and a 1 s timeout means no *success* can
+be slower than 1 s. Mean and median need not be close.
 
-Do not assume the data follows a normal distribution (a bell curve) without checking. If the
-shape is different, a rule that acts on outliers (restart a server with high request latencies)
-will fire too often, or not often enough.
+Do not assume a bell curve. A "restart on 3σ outlier" rule will fire too often on ordinary
+slow-but-ok requests (false outliers), and too rarely on hangs the timeout recorded as
+exactly 1 s.
 
-**Worked example: 100 requests, timeout at 1 second**
-
-| Latency | Requests |
-|---------|----------|
-| 40 ms | 60 |
-| 80 ms | 25 |
-| 400 ms | 10 |
-| timed out at 1 s | 5 |
-
-- **Median = 40 ms.** Half the requests are at or below 40 ms, so the middle of the sorted list
-  is still among the 60 requests that finished in 40 ms.
-- **Mean = 134 ms.** `(60×40 + 25×80 + 10×400 + 5×1000) / 100 = 134`. The ten slow successes and
-  five timeouts drag the average more than 3× past the median.
-
-**What "the tail is chopped off" means**
-
-A 1 second timeout is a rule the *service* enforces, not a fact about how long work takes. If a
-request has not finished by 1,000 ms, the server (or the client, or the load balancer) gives up,
-returns an error, and stops waiting.
-
-That has two consequences for the latency histogram of *successful* requests:
-
-1. **No success can be slower than 1,000 ms.** By definition a success is a request that finished
-   in time. The histogram of successes therefore has a hard right wall at the timeout. The long
-   tail you would have seen (1.2 s, 5 s, 30 s hangs) is not on the chart.
-2. **You lose the real duration of the failures.** Those five timed-out requests might have
-   finished at 1,001 ms if you had waited 1 more millisecond, or they might still be hung at 30 s.
-   The metric does not distinguish.
-
-**The problem with the two ways of recording those five**
-
-You have to put them *somewhere*. Both choices distort the picture, in opposite directions.
-
-- **Drop them from latency** (they are errors only). The latency chart is then *conditioned on
-  success*: you threw out the worst users. Mean of the remaining 95 is 88 ms, not 134 ms, and p99
-  looks like 400 ms. Latency dashboards and latency SLOs stay green. The 5% who got nothing only
-  show up if someone is watching the error rate, and even then you do not see that those errors
-  were "hung for a long time" vs "failed immediately." Slow-but-ok and failed-badly live on two
-  different graphs, so a hang can look like a mild availability dip.
-- **Record them as exactly 1,000 ms** (what this example does). A request that missed the deadline
-  by 1 ms and a thread that would still be hung at 30 s occupy the same bar. Mean and p99 move a
-  little, but nothing in the chart says "extreme." A restart-on-very-slow-request rule never sees
-  a 30 s outlier, so it under-fires. You also mix failures into a success-latency number, which
-  muddles "the service was slow" with "the service gave up."
-
-Either way the true tail is missing, so you make the wrong call: you overreact to the visible
-400 ms successes (they look like outliers on a bell curve) and underreact to the invisible hangs
-(they never appear as 30 s). Computing systems *manufacture* this shape. If you treat the chart
-as a natural distribution, your automation and your SLOs inherit the lie.
-
-So "chopped off" is literal: someone took scissors to the right-hand side of the distribution at
-1,000 ms. The 40 ms and 80 ms bars are real user experience. The empty space to the right of the
-wall is not "we have no slow requests"; it is "we refused to keep measuring past 1 s."
-
-The left side is chopped too: nothing can finish in less than 0 ms. Together, floor at 0 and
-ceiling at the timeout are why this is not a bell curve, and why mean and median need not be
-close.
-
-See the six-step walkthrough: <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Mean vs median</a>.
-
-**Why this breaks "restart on outlier" automation**
-
-If you assume a bell curve without checking, a rule that "acts on outliers" (restart the slow
-server) will fire at the wrong rate.
-
-**What a bell curve and σ are**
-
-A bell curve (normal distribution) is a shape where most values sit near the middle, and values
-get rarer as you move away. σ (sigma) is one step of typical spread, the width of that bump.
-
-The orange curve on step 5 is that assumed shape: centre 50 ms, σ = 20 ms. Read it as "we believe
-a typical request is 50 ms, and 20 ms is a normal amount of jitter."
-
-From the centre, count steps of 20 ms:
-
-| How far from 50 ms | Latency | If it really were a bell curve |
-|---|---|---|
-| 1σ | 30–70 ms | about 68% of requests |
-| 2σ | 10–90 ms | about 95% of requests |
-| 3σ | 0–110 ms | about 99.7% of requests (the left side hits 0 ms) |
-
-"3σ outlier" is shorthand for **slower than 50 + 3×20 = 110 ms**. Under a true bell curve, only
-about **0.15%** of requests are that slow: roughly **1 in 700**.
-
-**What our 100 requests actually do**
-
-Slower than 110 ms in the table: the 10 at 400 ms plus the 5 timeouts = **15 of 100 = 15%**.
-
-15% vs 0.15% is **100 times** more often than the model allows. A rule "restart the server if we
-see latency over 110 ms" would treat ordinary tail traffic as a broken machine, constantly.
-
-**Why they are false outliers**
-
-An outlier, in the sense that restart-the-server automation cares about, means "this is so rare
-it probably means the machine is sick." That is only true if your picture of "rare" is right.
-
-The 10 requests at 400 ms **succeeded**. Users got an answer. A long tail of slow-but-ok requests
-is normal for latency (locks, garbage collection, a cold cache, a bigger payload). Ten in a
-hundred can be the everyday shape of the service, not a crisis. They look like 3σ events only
-because the bell curve claims 110 ms is already "almost never." The name "outlier" is coming from
-the model, not from a failure.
-
-So they are **false** outliers: flagged as weird, actually ordinary tail. Acting on them
-(restart, page, stop deploys) punishes a healthy system.
-
-The 5 timeouts are different: those users did not get an answer. They are real failures. They
-are still not "3σ of a bell curve." They are requests the timeout chopped at 1 s. Treating them
-as statistical outliers of latency mixes up "slow success" and "gave up."
-
-On the chart the orange bump dies out by 110 ms. The 400 ms and 1 s bars sit in the region the
-bump says should be almost empty. That is the mismatch. The data is not a bell curve, so the
-110 ms threshold is the wrong definition of "weird."
-
-The timeout then breaks the same rule in the other direction: a server hung for 30 s is recorded
-as 1,000 ms, same as a request that just grazed the deadline. The automation never sees a 30 s
-outlier, so it does not restart when it should.
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Mean vs median</a>
+(100 requests, chopped tail, false outliers, hidden hangs).
 
 ### Standardize Indicators
 
@@ -413,201 +287,43 @@ already holds them. That is why these two lines mean the same thing:
   (measured across all the backend servers).`
 - Short: `99% of Get RPC calls will complete in less than 100 ms.`
 
-The parentheses are not extra flavour. They are the house defaults (1-minute window, all backend
-servers). Once the team agrees those defaults, the short line is enough. Anyone who needs the
-missing details looks them up in the template.
+The parentheses are the house defaults (1-minute window, all backend servers). Once those
+are agreed, the short line is enough. Silence means "use the template." The short line is
+not a weaker promise.
 
-**Why the second line is not a weaker promise**
-
-Think of the template as a filled-in form. The long line writes every box. The short line writes
-only the boxes that change (99%, Get RPC, 100 ms). The other boxes stay as they were. If you
-changed a default (measure at the client, or average over 1 hour), you would say so. Silence
-means "use the template."
-
-**Why one target is not always enough: the shape of the curve**
-
-A single SLO pins *one point* on the latency distribution (the set of all request times, from
-fastest to slowest). Many different shapes can pass that one point.
-
-Both services below meet `99% of Get RPCs finish in under 100 ms`. Users do not experience them
-as the same product.
-
-| | Service A (snappy typical) | Service B (slow typical) |
-|---|---|---|
-| 90 requests | 1 ms | 85 ms |
-| 9 requests | 8 ms | 95 ms |
-| 1 request | 90 ms | 99 ms |
-| p90 | 1 ms | 85 ms |
-| p99 | 90 ms | 99 ms |
-| Passes `99% < 100 ms`? | yes | yes |
-| Feels instant for most people? | yes | no |
-
-Shape is important when the *typical* request and the *tail* request are different product
-promises:
-
-- **Search or a checkout button.** Sort the 100 request times from fastest to slowest. **p90**
-  is the time of request number 90 in that list. 90 of 100 finished in that time or less. That
-  is what most people feel when they click. **p99** is the time of request number 99. 99 of
-  100 finished in that time or less. That is the unlucky 1%. If p99 is under 100 ms (the SLO
-  still looks healthy) but p90 is already 85 ms, almost every click is slow. Users do not get
-  the fast 1%. They get the slow 90. The product feels slow to everyone, not only to the
-  unlucky one. One SLO at 100 ms cannot see this, because both the 85 ms clicks and the 99 ms
-  click still pass.
-- **A batch report.** Users will wait seconds for a nightly PDF. They do not need 90 of 100
-  reports in 1 ms. They need the report to arrive before the morning meeting. So you watch the
-  far tail: how late is the slow one?
-
-  **What `p99` and `p99.9` mean.** The number after `p` is a percent. `p99` is the time that
-  99 of 100 jobs finish in that time or less (1 in 100 is slower). `p99.9` is the time that
-  999 of 1,000 jobs finish in that time or less (1 in 1,000 is slower).
-
-  Example: 1,000 reports must be in inboxes by 08:00. 999 finish by 07:50. One finishes at
-  10:00. p99 is still about 07:50 (only 1 in 100 is allowed to be later, and you have only 1
-  late job in 1,000). p99.9 is 10:00: that is the one job that missed the meeting. If "almost
-  nothing may be late" is the promise, p99.9 is the number you set a deadline on.
-
-  Why more machines for p90 = 1 ms do not fix that SLO: the SLO you set is p99.9 (in by
-  08:00). p90 is already a pass. 999 reports are in at 07:50. Buying CPUs so those 999 finish
-  in 1 ms changes p90 only. It does not change p99.9. The 10:00 job is late for a different
-  reason (a stuck worker, a huge file, a lock). Making the other 999 faster does not finish
-  that job. The meeting still misses that one file. The SLO you set is still missed.
-- **Two user populations.** The same API serves phones on slow networks and an internal admin
-  tool on a fast office network. Phone requests cluster around a slower time. Admin requests
-  cluster around a faster time. One 100 ms SLO is a compromise that fits neither group. Two
-  targets (or two SLOs, one per client type) make both groups visible.
-- **A regression that "still passes."** The common path is the code every request runs (auth,
-  logging, a new feature check). Engineers add work there. Before: 90 of 100 requests finish
-  in 1 ms. After: those same 90 finish in 80 ms. The one slow request is still under 100 ms,
-  so p99 has not moved past the 100 ms SLO.
-
-  If you only have one target (`99% under 100 ms`), that SLO is still true. No alert fires.
-  90 of 100 clicks now take 80 ms instead of 1 ms.
-
-  If you have the three targets below, the first one is now false: 90 of 100 requests are
-  *not* under 1 ms. Monitoring marks that SLO as missed. **Page you** means it sends an
-  on-call alert (phone, Slack, pager) to the engineer who is on duty, so someone looks at
-  the change the same day, not after a week of tickets that say the site is slow.
-
-That is why the book offers a *stack* of SLOs when shape matters:
+**One target is not always enough.** A single SLO pins one point on the distribution. Two
+shapes can both pass `99% under 100 ms` while most users feel something different. **p90**
+is the time 90 of 100 finished in or less (what most people feel). **p99** is the time 99
+of 100 finished in or less. When both the typical click and the rare slow one matter, write
+a stack:
 
 - `90% of Get RPC calls will complete in less than 1 ms.`
 - `99% of Get RPC calls will complete in less than 10 ms.`
 - `99.9% of Get RPC calls will complete in less than 100 ms.`
 
-Together they say: most requests finish in about 1 ms, almost all still finish in 10 ms, and
-only a few may take as long as 100 ms. Service B above would miss the first two lines. See
+See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Same SLO, two shapes</a>.
 
-**Two classes of work on the same write**
-
-A **heterogeneous workload** means mixed types of work on one API. Same `Set` call. Two
-different customers.
-
-An **RPC** (remote procedure call) is a function call that crosses the network: your code
-calls `Set` here, another machine does the write there. `Set` is the write. `Get` would be
-the read.
-
-The two customers want different things from that same `Set`:
-
-- **Throughput client:** a bulk pipeline. It wants many writes to finish per hour. Each write
-  can take up to 1 second. The person is not waiting on a click.
-- **Latency client:** a person waiting on a click (a phone, a form). Each *small* write must
-  feel instant.
-
-So you write two SLOs, not one:
+**Two classes of work on the same write.** A **heterogeneous workload** is mixed types of
+work on one API. An **RPC** is a function call that crosses the network (`Set` = write).
+A pipeline can wait 1 s. A person clicking cannot. **Payload** is the size of the write;
+the click SLO only counts small ones (under 1 kB). Write two SLOs, and split the traffic
+so monitoring can tell them apart:
 
 - `95% of Set RPC calls from throughput clients will complete in less than 1 s.`
 - `99% of Set RPC calls from latency clients, with payloads under 1 kB, will complete in
   less than 10 ms.`
 
-**Payload** is the size of the data in the write. 1 kB is 1,024 bytes, about a short
-paragraph of text. The second line only counts those small writes.
-
-**Why two lines, not one number for every `Set`**
-
-| If you write… | What happens |
-|---|---|
-| One SLO: every `Set` under 10 ms | The pipeline fails every day. A 10 MB nightly dump cannot finish in 10 ms. Your phone rings for that dump. The dump is fine. A slow click does not ring. |
-| One SLO: every `Set` under 1 s | The phone can wait up to 1 second and the SLO stays green. No alert. The click feels broken. |
-| One mixed bucket of all `Set`s | The pipeline may send millions of large writes. Combined p99 (the time 99 of 100 finish in or less) looks like those large writes. The 10 ms clicks disappear in the pile. |
-
-**Why the latency line also says "payloads under 1 kB"**
-
-A 10 MB write from a phone cannot finish in 10 ms either. If you put large writes in the
-"fast click" SLO, that SLO is always red. The filter keeps that SLO about the writes a click
-actually sends. Large writes are measured under a different rule, or under the throughput
-SLO.
-
-**How you tell the two classes apart**
-
-A header, a client ID, a separate API key, or the payload-size filter. Monitoring must be
-able to split the requests. If every `Set` looks the same, you cannot apply two SLOs.
-
-**Why 95% on the pipeline and 99% on the click**
-
-The pipeline can accept 5 slow writes in 100. A person clicking cannot accept 5 slow clicks
-in 100. Only 1 in 100 clicks may miss 10 ms.
-
-This is the same idea as the "two user populations" note above, now with numbers. See
+One number for every `Set` either pages you for a fine dump, or hides the slow clicks.
+See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Two workload classes</a>.
 
-**Do not require the SLO 100% of the time. Keep an error budget.**
-
-An **error budget** is the allowed miss rate. Chapter 3 wrote it as `1 − SLO`. Same number,
-now used as a daily working limit.
-
-Example: the SLO is `99.9% of Sets succeed`. In 1,000 Sets, 999 must succeed. The leftover
-**1 Set may fail**. That 1 is the budget.
-
-A 100% SLO means the leftover is 0. That is both impossible and a bad product choice.
-
-- **Unrealistic.** Something always fails: a deploy, a network blip, a bad payload. You will
-  miss. Then the SLO is a lie.
-- **It slows shipping.** Any failure is a miss. Teams freeze deploys. New features wait.
-- **It gets expensive.** You buy extra regions, extra replicas, extra review gates, so nothing
-  can fail. The success rate users already see (99.9%) does not change. The bill does.
-
-So you write the miss on purpose. Then you **spend** it on purpose: a risky launch, a planned
-Chubby outage, a week of faster deploys. The budget is the room to take those risks without
-breaking the promise.
-
-**Watch the spend on two clocks**
-
-| Who | How often | Why |
-|---|---|---|
-| The team | Every day, or every week | You can still steer. Monday used 80 of 100 allowed misses. You slow deploys on Tuesday. |
-| Upper management | Every month, or every quarter | Same number, zoomed out. The board does not need Monday. They need "this quarter we stayed inside 0.1%." |
-
-Daily and weekly are not a different SLO. They are a finer grain of the same allowance. If you
-only look once a quarter, the quarter is already over when you see you overspent.
-
-**"An error budget is just an SLO for meeting other SLOs"**
-
-That line packs two layers. Split them.
-
-- **Product SLO** (the one users feel): `99.9% of Sets succeed.`
-- **Budget SLO** (the one the team watches): `this week, the share of failed Sets will stay at
-  or under 0.1%.`
-
-The second line is itself an SLO. The SLI is "how much of the allowance have we used." The
-target is "do not use more than 100% of the allowance." You are setting an objective on
-whether you are still meeting the other objectives.
-
-Worked week: 1,000,000 Sets. 0.1% of that is 1,000 allowed failures.
-
-| Day | Failures | Budget left (of 1,000) |
-|---|---|---|
-| Monday | 800 | 200 |
-| Tuesday | 50 | 150 |
-| Wednesday–Sunday | 40 | 110 |
-
-Monday did not break the product SLO by itself. It spent most of the week's budget SLO. Daily
-tracking is what makes that visible on Monday, not in the quarterly report.
-
-If the week ends at 0 left, you stop spending (freeze risky deploys) until the next window
-refills the allowance. If the quarter ends with budget left, that leftover is what the Chubby
-planned outage spends on purpose (see that case study above). Leftover is not a bonus. It is
-unspent risk that other teams start to depend on.
+**Do not require the SLO 100% of the time.** An **error budget** is the allowed miss rate
+(`1 − SLO`). Example: `99.9% of Sets succeed` means 1 of 1,000 may fail. That leftover is
+what you spend on purpose (a launch, a planned Chubby outage). A 100% SLO sets the leftover
+to 0: unrealistic, it freezes deploys, and it gets expensive. Watch the spend every day or
+week so you can still steer. A month or quarter rollup is for management. That "stay inside
+the allowance" line is itself an SLO on the other SLOs.
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Error budget</a>.
@@ -616,259 +332,55 @@ See
 
 #### Don't pick a target based on current performance
 
-You still measure current performance. That tells you what the system can do today, and where
-it is weak. The mistake is taking that dashboard number and publishing it as the target
-without asking whether users need that number, and what it costs to keep hitting it.
+Measure current performance to learn merits and limits. Do not publish tonight's dashboard
+number as the SLO. **Heroic effort** means the number only holds because people do manual
+work (restart workers at 02:00). Copy 10 ms and those night restarts become the promise.
 
-**Heroic effort** means the number only holds because people do manual work the system cannot
-do: two engineers restart stuck workers every night, or they babysit every deploy. That is
-not a property of the product. It is overtime.
-
-Example: tonight's dashboard says p99 (the time 99 of 100 requests finish in or less) is
-10 ms. How? Two people restart workers at 02:00. You publish `99% of Sets finish in under
-10 ms`. Now the night restarts are part of the promise. You cannot stop them without missing
-the SLO. The only way out is a redesign that makes 10 ms true without the heroes. You locked
-the current architecture in.
-
-Reflect first. Ask: what do users need? If they are happy at 50 ms, write `99% under 50 ms`.
-The night restarts can stop. The SLO stays green. You still know the system can do 10 ms
-today. That fact is a merit, not a contract.
-
-The other lock-in: today's p90 is 85 ms because the common path is fat (Service B in the
-shape note above). If you copy 85 ms as the SLO, the slow typical click becomes the promise.
-A later redesign that aims for 1 ms is "extra," because the SLO is already green.
+Ask what users need. If they are happy at 50 ms, write that. Today's 10 ms stays a merit,
+not a contract.
 
 #### Have as few SLOs as possible
 
-Pick just enough to cover the attributes users notice: usually availability, latency, and
-maybe durability or freshness. Each extra SLO is another graph nobody watches.
+Pick just enough to cover what users notice (usually availability, latency, maybe
+durability or freshness).
 
-**The meeting test.** An SLO earns its place if people use that number to decide "ship this
-week, or wait." If a line has never changed a launch decision, it is not an SLO. You can
-still put it on a dashboard.
+**The meeting test:** keep a line only if people use it to decide ship or wait. **Wait**
+means do not turn the filter on this week. Product cuts the extra 80 ms. It is not "SRE,
+make the 20 ms click faster." **CPU idle** is a capacity graph. It did not change ship
+or wait, so it is not an SLO. **User delight** has no shared ruler, so it is not an SLO
+either.
 
-Walk through one Friday meeting.
-
-Today each click takes about 20 ms. Product wants to ship a photo filter this week. The
-filter adds 80 ms to every click.
-
-`20 ms + 80 ms = 100 ms` per click after the filter.
-
-The written promise is `99% of small Sets finish in under 50 ms`. 100 is bigger than 50.
-Most clicks would miss the promise.
-
-So you say wait. That does not mean "SRE, make today's 20 ms click faster." The 20 ms
-click already passes. The extra 80 ms is the problem.
-
-**Wait** means: do not turn the filter on for everyone this week. The people who built
-the filter (usually the product engineers) cut that 80 ms down. Example: they get it to
-25 ms. Then `20 + 25 = 45`, which is under 50, and you can ship.
-
-A **flag** is an on/off switch in the code. The filter can go to production switched
-off for most users. A small test group can try it while the 80 ms is being cut. Most
-users still get the 20 ms click, so the promise stays true.
-
-The 50 ms line did the job: two teams disagreed, and the pre-agreed number picked the
-next step. That is all "win an argument" means. It is not about being louder. It is
-about pointing at a number everyone already accepted.
-
-That is the whole filter story. CPU idle is not a second part of that problem.
-
-**Why CPU idle is on the slide at all**
-
-The book also said: have as few SLOs as possible. So you run the *same meeting test* on
-other lines people might want to promote to an SLO.
-
-**CPU idle** is unused processor time. 55% idle means the machines are busy only 45% of
-the time. That is a useful capacity graph (do we need more machines?). It does not tell
-you if the click will stay under 50 ms.
-
-In the Friday meeting, two numbers were in the room:
-
-| Number | Did it change ship or wait? | Then it is… |
-|---|---|---|
-| 99% of clicks under 50 ms | Yes. 100 > 50, so wait. | An SLO. Keep it. |
-| CPU idle is 55% | No. Nobody said "idle is fine, ship the filter." | A graph. Not an SLO. |
-
-The pink box is the second row. Its goal is not to fix the filter. Its goal is to show a
-line that fails the meeting test, so you do not add it to the SLO list. You can still
-open the idle graph next week when you plan machines.
-
-**User delight** fails the same test for a different reason. Delight has no shared ruler.
-Two people will not agree that "delight is 80." You cannot send an on-call alert
-(page you) for "less delighted." Keep delight as a product goal. Put an SLO on the pieces
-you can count: the click was fast, the write stayed.
-
-**A good SLO moves the work. A bad one wastes it, or lets the product rot.**
-
-SLOs should set the order of work for both SRE and product engineers. They name what users
-care about (the click was fast, the write stayed). Then the team does the work that keeps
-those lines true, and waits on work that would break them. The Friday filter meeting is
-that in action.
-
-A **forcing function** is a written rule that makes a decision happen when people disagree.
-The 50 ms line forced WAIT. Nobody had to "win" by being louder. That is a *helpful*
-forcing function: it pointed at a real user cost (100 ms clicks).
-
-The same lever cuts both ways. A **lever** here means a small change to the SLO number
-moves a lot of people and a lot of weeks.
-
-| SLO you write | What the team does | What users get |
-|---|---|---|
-| Too tight: `99% under 10 ms` (only true if two people restart workers at 02:00) | Heroic overtime, forever, or a huge redesign you may not need | 10 ms, at a cost users did not ask for. Wasted work. |
-| Just enough: `99% under 50 ms` | Filter waits until `20 + extra` stays under 50 | Clicks users already accept. Work goes to the 80 ms, not to the 20 ms. |
-| Too loose: `99% under 200 ms` | The filter ships this week. 100 ms still "passes." No one is paged. | Almost every click is slow. The product is worse. The SLO stays green. |
-
-Use the lever on purpose. Pick the number by what users need, not by tonight's dashboard,
-and not by a number so soft that a bad ship still looks healthy.
+The SLO is a **lever**: too tight wastes heroic work, too loose lets a slow product stay
+green. Pick the number by what users need.
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Choosing targets</a>
-(last step).
+(Friday meeting, then the lever).
 
 ### Control Measures
 
-SLIs and SLOs are the two numbers in a **control loop**: a cycle you repeat to steer the
-system. Think of a thermostat. The room temperature is the SLI (what you read). The
-setpoint is the SLO (what you promised). If the reading is heading past the mark, you
-act. Then you read again.
+SLIs and SLOs are the two numbers in a **control loop** (like a thermostat: reading vs
+setpoint):
 
-The four steps:
+1. Measure the SLI.
+2. Compare it to the SLO. Decide if action is needed.
+3. If yes, find what would meet the mark (a hypothesis, then a test).
+4. Act. Then go back to step 1.
 
-1. **Measure the SLI.** Watch the ruler. Example: time for 99 of 100 clicks to finish
-   (p99).
-2. **Compare the SLI to the SLO.** Decide if action is needed. The mark is `99 of 100
-   clicks finish in 50 ms or less`. 28 ms is fine. 48 ms and still rising is not.
-3. **If action is needed, find what would meet the target.** This is a hypothesis, then
-   a test. Not a guess you ship blindly.
-4. **Take that action.** Then go back to step 1. The loop does not end.
-
-**Worked afternoon**
-
-SLO: `99 of 100 clicks finish in 50 ms or less`.
-
-| Time | SLI (p99) | Compared to 50 ms |
-|---|---|---|
-| 11:00 | 28 ms | Fine. Room to spare. |
-| 13:00 | 38 ms | Still under. Rising. |
-| 15:00 | 45 ms | Close. If the rise holds, you miss around 17:00. |
-
-Step 2 says: act now, or the promise misses in a few hours.
-
-Step 3: test "the servers are **CPU-bound**." CPU-bound means the processor is the
-bottleneck. Each machine's CPU is full. New clicks wait in line for a core. You check
-CPU graphs. If they sit near 100%, the hypothesis holds. The action is add more
-servers, so the line of clicks is split across more CPUs.
-
-Step 4: add the servers. Measure again. If p99 falls to 32 ms, the loop worked. If it
-does not, the hypothesis was wrong (maybe a lock, maybe a slow dependency). You do not
-keep adding servers. You form a new hypothesis.
-
-**Without the SLO you would not know whether to act, or when**
-
-Start with only the SLI. No mark on the ruler. The dashboard says:
-
-| Time | p99 (the time 99 of 100 clicks finish in or less) |
-|---|---|
-| 11:00 | 28 ms |
-| 13:00 | 38 ms |
-| 15:00 | 45 ms |
-
-Walk those three readings with no SLO on the wall.
-
-- **11:00, 28 ms.** 99 of 100 clicks finish in 28 ms or less. A fact. Not a pass. Not a miss.
-- **13:00, 38 ms.** Ten milliseconds worse than 11:00. You can say the number went up.
-- **15:00, 45 ms.** Another 7 ms worse. From 28 to 45 is 17 ms worse in four hours.
-
-**"A bit slower"** means only that: the number went up. 28 became 45. You have no rule
-that says "17 ms worse is enough to drop everything." You also have no rule that says
-"17 ms worse is fine." The graph is a story with no last page.
-
-**"Is 45 ms a fire?"** Fire here means an emergency: send an on-call alert (page you),
-stop other work, add servers *this afternoon*. The opposite of a fire is "interesting,
-watch it tomorrow."
-
-45 ms cannot be a fire by itself. Fire is "we are about to break a promise" or "we
-already broke it." No promise is written, so 45 ms is not a fire and not "fine." It is
-an unfinished sentence. Two people can argue all afternoon.
-
-**Whether** means: do we add servers *today at all*?  
-**When** means: if we add them, do we add them at 15:00 (while there is still room), or
-only after users are already over the mark?
-
-Those two questions stay open until someone writes the SLO. The same three readings then
-split into two afternoons.
-
-| | Team A wrote `99% under 50 ms` | Team B wrote `99% under 200 ms` |
-|---|---|---|
-| 15:00 reading | 45 ms. Only 5 ms left to the mark. | 45 ms. 155 ms left to the mark. |
-| If the rise holds | Hits 50 ms around 17:00. That is a miss. | Hits 50 ms around 17:00 too, but 50 ms is not their mark. They still have room until ~200 ms. |
-| Whether to act | Yes. Add servers today. | No. Do not spend the afternoon adding servers. |
-| When to act | At 15:00, *before* 17:00. After 17:00 the promise is already broken. | Not today. Watch the graph tomorrow. |
-
-Why 17:00? From 11:00 to 15:00 the reading rose about 17 ms in four hours (28 → 45).
-That is roughly 4 ms per hour. 45 + 8 ms more (two hours) is about 53 ms. So if nothing
-changes, Team A crosses 50 ms around 17:00. Team B's 200 ms mark is still far away on
-that slope.
-
-Same SLI path. Different action. The SLO is what turned "the number went up 17 ms" into
-either "this is a fire, act at 15:00" or "this is not a fire, do not act today."
-
-If *neither* team wrote an SLO, you are stuck at the argument. Some people add servers
-(maybe wasted work). Some people wait (maybe a real miss of a promise nobody wrote). The
-control loop has no step 2.
-
-The Friday filter meeting is the same loop, just slower: measure (20 ms), compare
-(20 + 80 = 100, mark is 50), decide (wait), act (cut the extra 80 ms). Daily error-budget
-tracking is the same loop on the miss-rate SLI.
+Without the SLO you would not know **whether** to act (add servers today at all) or
+**when** (at 15:00, before the miss). The same 28 → 45 ms path is a fire at a 50 ms mark
+and not a fire at a 200 ms mark.
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Control loop</a>.
 
 ### SLOs Set Expectations
 
-Publishing the SLOs tells users (and people who might become users) what the product will
-do. They use those numbers to decide "is this service right for us?"
-
-**Availability** is "can I use it *now*?" The share of requests that succeed when someone
-tries. **Durability** is "will the file still be there *later*?" The share of written
-objects you can still read back next year.
-
-You rarely get all three of: always up, never lose a file, and cheap. A service picks a
-mix and writes it as SLOs. That mix is the offer.
-
-**The book's example, unpacked**
-
-One storage service publishes this offer:
-
-- Very strong **durability** (almost never lose a file)
-- Low **cost**
-- In exchange: slightly lower **availability** (sometimes you cannot reach it *now*)
-
-"In exchange" means the trade. They sold cheap + keep-the-file. They did not sell
-always-up.
-
-Put numbers on it so the two buyers can choose.
-
-| SLO they published | In a year that means |
-|---|---|
-| Availability 99% | Down about 7 hours in a typical month (3.65 days in a year) |
-| Durability 99.99% | About 1 file in 10,000 is lost in a year |
-| Price | Cheap per gigabyte |
-
-**Photo-sharing site (Instagram-like).** People open the app *now* to upload and look.
-Seven hours down in a month is a broken product. Users cannot post. They also care about
-not losing photos, but they will not take "cheap and safe files" if the app is often
-unreachable. They **avoid** this service. They pay more for a store that is up more often.
-
-**Archival records (a government warehouse of old files).** The product is "this file
-still exists in 20 years." A clerk can wait until Wednesday if Tuesday is down. Losing
-a file is the disaster. Cheap matters because they keep petabytes for decades. They
-**pick** the same service. The published SLOs match the job.
-
-Same offer. Two use cases. The SLOs let each team say yes or no *before* they build on
-it. That is what "sets expectations" means. Without the written mix, the photo team might
-assume "storage" means always-up, then discover the 7-hour month the hard way.
+Publishing the SLOs tells users what the product will do, so they can decide "is this
+right for us?" **Availability** is "can I use it *now*?" **Durability** is "will the file
+still be there *later*?" You rarely get always-up, never-lose-a-file, and cheap. The
+published mix is the offer. Same cheap + keep-the-file + sometimes-down store: a photo
+app says no, an archive says yes.
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">SLOs set expectations</a>.
@@ -876,19 +388,8 @@ See
 #### Keep a safety margin
 
 Write two marks on the same SLI. The **advertised SLO** is what users see. The
-**internal SLO** is tighter. You act when you miss the internal mark. Users only see a
-miss if you miss the advertised one. The gap is the buffer.
-
-Example: advertised `99% of clicks under 100 ms`. Internal `99% under 80 ms`. The
-buffer is 20 ms.
-
-| What happens | Internal 80 ms | Advertised 100 ms |
-|---|---|---|
-| A chronic creep: p99 goes 70 → 85 | Miss. Control loop starts today (add servers, find the leak). | Still a pass. Users do not see a broken promise. |
-| A cheaper rewrite: p99 goes 60 → 90 | Miss. You knew the trade before you shipped. | Still a pass. You traded speed for cost without disappointing users. |
-
-Without the internal mark, the first time anyone acts is when users already see 100 ms
-broken. The buffer is time: you respond while the promise they read is still true.
+**internal SLO** is tighter. You act in the gap, before users see a miss (advertised
+100 ms, internal 80 ms).
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">Safety margin</a>.
@@ -899,99 +400,30 @@ Users depend on what they actually get, not the written SLO. If you run much bet
 you advertised, they treat that as the real promise, which is why Chubby takes planned
 outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outage) above).
 
-**The SLO decides where the next week of people goes**
-
-"How well is the system meeting its expectations?" means: compare the SLI to the SLO
-(and look at error-budget left). That answer picks the next pile of work. It is the
-control loop's step 2, used on a planning calendar, not only on a Tuesday afternoon.
-
-**Not fine** (internal SLO red, or the week's error budget almost gone): put people on
-the service itself.
-
-- **Faster:** cut latency (the extra 80 ms on the filter, add servers when p99 is heading
-  at 50 ms).
-- **More available:** raise the share of requests that succeed.
-- **More resilient:** recover when something breaks (retries, a fallback, a second
-  region), so one failure does not take the whole promise with it.
-
-**Fine** (internal SLO green, advertised green, budget left): do *not* spend the week
-making 28 ms into 20 ms. Users already have the promise. Put people on other work.
-
-- **Technical debt:** a shortcut you took that makes the next change harder (a manual
-  night restart, a module nobody wants to touch). Pay it down while the SLO is green.
-- **New features,** or another product.
-
-Same rule as the error budget: leftover allowance is permission to ship. A spent
-allowance is permission to stop shipping and fix the service. The Friday meeting was
-one decision. This is that decision for the whole roadmap.
+The SLO also picks the next week of people. Internal red or budget almost gone: invest in
+faster, more available, or more resilient. Green and budget left: pay down **technical
+debt** (a shortcut that makes the next change harder), ship features, or start another
+product. Do not spend a green week turning 28 ms into 20 ms.
 
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">Invest where</a>.
 
 ## Key takeaways
 
-- SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
-  are the targets you set on those measurements. The SLO is always the SLI plus a comparison
-  plus a number. You need a good SLI before an SLO means anything. A 99.7% success reading
-  is not a miss until someone wrote the promise (for example 99.9%).
-- Treat metrics as distributions, not averages. An average latency can stay flat all day while
-  p95 and p99 get 20× worse. Alert on the slow requests you care about, not the mean.
-- Standardize SLIs with reusable templates (availability, latency, throughput, durability,
-  pipeline freshness). Once the house defaults are agreed, an individual SLI is just the service
-  name plus any override.
-- Latency is bounded and skewed (floor at 0 ms, timeout cap), so mean and median often diverge.
-  Don't assume a bell curve: an "outlier" restart rule will fire too often on a heavy tail, or
-  too rarely if timeouts hide the real hangs.
-- Start from what users care about, then work backward to indicators, even if you have to
-  approximate. Starting from what's easy to measure produces weaker SLOs.
-- A short SLO can omit the measurement rules once those rules live in the SLI template. The
-  short line is not a weaker promise.
-- One SLO pins one point on the distribution. Many shapes can pass `99% < 100 ms`. Use several
-  targets (p90, p99, and p99.9) when both the typical request and the rare slow request matter
-  to the product.
-- The same `Set` RPC can need two SLOs when two client classes want different things. A bulk
-  pipeline can wait 1 second. A person clicking cannot. Do not mix them into one bucket.
-- Do not require an SLO 100% of the time. The leftover (`1 − SLO`) is the **error budget**:
-  allowed misses you spend on purpose. Track the spend every day or every week so you can
-  steer. A month or quarter rollup is for management. That "stay inside the allowance" line
-  is itself an SLO on the other SLOs.
-- Do not copy today's dashboard number as the SLO. Measure current performance to learn
-  merits and limits. Publishing that number without reflection locks in today's architecture
-  and any heroic effort that produced it. Keep as few SLOs as you can defend: if a line has
-  never changed a "ship or wait" decision, drop it from the SLO list. "User delight" is not
-  an SLO. It has no shared number. A good SLO is a forcing function: it picks ship or wait
-  when people disagree. Too tight wastes heroic work. Too loose lets a slow product stay
-  green.
-- SLIs and SLOs run a control loop: measure the SLI, compare it to the SLO, decide what
-  would meet the mark, act, measure again. Without the SLO you can see latency rise and
-  still not know whether to act (add servers today at all), or when (at 15:00, before
-  the miss). Same 28 ms → 45 ms path is "act at 15:00" at a 50 ms mark and "do not act
-  today" at a 200 ms mark.
-- Prefer measuring what users actually experience over what's convenient to measure (client-side
-  latency over server-side, for instance), and fall back to a proxy only when the real thing is
-  out of reach.
-- Availability as "fraction of well-formed requests that succeed" (yield) is the practical,
-  achievable framing; 100% is off the table, so talk in nines instead (Google Compute Engine
-  targets "three and a half nines", 99.95%).
-- Some SLOs aren't yours to set: how many users arrive (traffic volume) is their choice, not a
-  target you pick. The SLOs you do set can pull on each other. If you push the service to
-  handle more requests per second, each request often gets slower. Past a load point (a
-  performance cliff) latency jumps all at once, not a little at a time.
-- Publish your SLOs. A written target is better than letting users guess. If you never say the
-  number, people invent one: they assume you are more available than you are, or less available
-  than you are. The same published mix (cheap, keep the file, sometimes down) is a no for a
-  photo app and a yes for an archive. The numbers let each team choose before they build.
-  Keep a tighter internal SLO than the one you advertise, so you can act before users see
-  a miss. Do not run far better than you advertised: users will depend on the extra
-  (Chubby planned outages).
-- The SLO picks the next week of people. Internal red or budget almost gone: invest in
-  faster, more available, or more resilient. Green and budget left: pay down technical
-  debt, ship features, or start another product. Do not spend a green week shaving 28 ms
-  to 20 ms.
-- SLA is an SLO plus a consequence for missing it. SRE doesn't own SLAs (they're a business
-  decision), but does own keeping the service inside them and defining the SLIs they're measured
-  against. Even without a formal SLA, unavailability still has real consequences (reputation,
-  revenue), so tracking SLIs/SLOs is worthwhile regardless.
+- SLI = the measurement. SLO = the mark on that measurement (`SLI` + a comparison + a number).
+  SLA = an SLO plus a consequence for missing it.
+- Treat latency as a distribution, not an average. Percentiles show the tail. Do not assume
+  a bell curve (see [Mean vs median](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html)).
+- Start from what users care about, then pick indicators. Standardize SLIs with house
+  templates so a short SLO is not a weaker promise.
+- One SLO pins one point. Use a stack, or two SLOs on the same `Set`, when typical and tail
+  (or pipeline and click) are different promises.
+- An error budget is `1 − SLO`. Spend it on purpose. Watch it daily or weekly.
+- Do not copy today's dashboard number. Keep only SLOs that change ship or wait. Too tight
+  wastes heroes. Too loose lets a slow product stay green.
+- Control loop: measure, compare, decide, act. Without the mark you do not know whether or
+  when. Publish the mix so buyers can choose. Keep a tighter internal SLO. Do not
+  overachieve (Chubby). The SLO also picks the next week of people.
 
 <!-- obsidian:end -->
 

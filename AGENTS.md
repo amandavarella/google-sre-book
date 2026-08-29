@@ -60,7 +60,9 @@ becomes a **decision with numbers**.
   "service tiers at different costs"), attach a concrete example in that line.
 - **Step by step, then a diagram.** Chubby, percentiles, the control loop: first unpack in
   order, then a step-through diagram with the same numbers. Link the diagram **inline** next
-  to the passage, not only in the chapter table.
+  to the passage, not only in the chapter table. Once the diagram exists, **do not keep the
+  walkthrough in the notes**. The note holds the claim, any jargon, and the link. The diagram
+  holds the steps, tables, and Friday-meeting numbers.
 - **Draw the shape.** Never say "pretend" or "imagine" a curve. If the claim is "this looks
   like a bell curve," put the curve on the chart. Scaffolding she no longer needs (an extra
   histogram) can be removed after she says she gets it.
