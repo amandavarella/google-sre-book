@@ -869,6 +869,34 @@ assume "storage" means always-up, then discover the 7-hour month the hard way.
 See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">SLOs set expectations</a>.
 
+**Two tactics so the published number stays honest**
+
+**1. Keep a safety margin**
+
+Write two marks on the same SLI. The **advertised SLO** is what users see. The
+**internal SLO** is tighter. You act when you miss the internal mark. Users only see a
+miss if you miss the advertised one. The gap is the buffer.
+
+Example: advertised `99% of clicks under 100 ms`. Internal `99% under 80 ms`. The
+buffer is 20 ms.
+
+| What happens | Internal 80 ms | Advertised 100 ms |
+|---|---|---|
+| A chronic creep: p99 goes 70 → 85 | Miss. Control loop starts today (add servers, find the leak). | Still a pass. Users do not see a broken promise. |
+| A cheaper rewrite: p99 goes 60 → 90 | Miss. You knew the trade before you shipped. | Still a pass. You traded speed for cost without disappointing users. |
+
+Without the internal mark, the first time anyone acts is when users already see 100 ms
+broken. The buffer is time: you respond while the promise they read is still true.
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">Safety margin</a>.
+
+**2. Don't overachieve**
+
+Users depend on what they actually get, not the written SLO. If you run much better than
+you advertised, they treat that as the real promise, which is why Chubby takes planned
+outages (see [The Global Chubby Planned Outage](#the-global-chubby-planned-outage-case-study) above).
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -922,6 +950,9 @@ See
   number, people invent one: they assume you are more available than you are, or less available
   than you are. The same published mix (cheap, keep the file, sometimes down) is a no for a
   photo app and a yes for an archive. The numbers let each team choose before they build.
+  Keep a tighter internal SLO than the one you advertise, so you can act before users see
+  a miss. Do not run far better than you advertised: users will depend on the extra
+  (Chubby planned outages).
 - SLA is an SLO plus a consequence for missing it. SRE doesn't own SLAs (they're a business
   decision), but does own keeping the service inside them and defining the SLIs they're measured
   against. Even without a formal SLA, unavailability still has real consequences (reputation,
@@ -942,6 +973,7 @@ See
 | **Choosing targets**: do not copy today's 10 ms if heroes produce it; keep only SLOs that change ship or wait; last step is the lever (too tight, just enough, too loose) | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Control loop**: measure the SLI, compare to the SLO, find an action, act; without the mark, 28 ms → 45 ms has no deadline | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **SLOs set expectations**: same offer (cheap, keep the file, sometimes down); photo app says no, archive says yes | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Safety margin**: advertised 100 ms, internal 80 ms; you act in the 20 ms gap before users see a miss | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
