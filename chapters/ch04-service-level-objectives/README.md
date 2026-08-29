@@ -425,9 +425,18 @@ promises:
 - **Two user populations.** Mobile clients on slow networks vs an internal admin tool on the
   same API. One 100 ms SLO is a compromise that fits neither. Two targets (or two SLOs) make
   the two humps visible.
-- **A regression that "still passes."** Engineers add work to the common path. p90 moves from
-  1 ms to 80 ms. p99 stays under 100 ms. A single SLO stays green. A stack of targets would
-  fail the line "90% of requests finish in under 1 ms" and page you.
+- **A regression that "still passes."** The common path is the code every request runs (auth,
+  logging, a new feature check). Engineers add work there. Before: 90 of 100 requests finish
+  in 1 ms. After: those same 90 finish in 80 ms. The one slow request is still under 100 ms,
+  so p99 has not moved past the 100 ms SLO.
+
+  If you only have one target (`99% under 100 ms`), the dashboard stays green. Nobody is
+  woken up. Users already feel the 80 ms wait on almost every click.
+
+  If you have the three targets below, the first one is now false: 90 of 100 requests are
+  *not* under 1 ms. Monitoring marks that SLO as missed. **Page you** means it sends an
+  on-call alert (phone, Slack, pager) to the engineer who is on duty, so someone looks at
+  the change the same day, not after a week of "the site feels slow" tickets.
 
 That is why the book offers a *stack* of SLOs when shape matters:
 

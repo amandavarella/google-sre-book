@@ -32,9 +32,10 @@ English is a second language. Write so a careful reader can study without decodi
 - **Anticipate the next question.** If a sentence packs two ideas (for example "fine at p99 and
   sluggish at p90"), unpack it before she has to ask: say what p90 and p99 *are*, then say who
   feels each one, then say why that matters. Do not use a metaphor ("trains users to wait")
-  when a number will do. Do not write `p99 / p99.9` to mean "or": write "p99 or p99.9", then
-  say how many requests each one is (99 of 100, 999 of 1,000). When she asks "I don't get X",
-  rewrite X in the notes that same way, and treat the question as a style bug to avoid next time.
+  when a number will do. Do not write `p99 / p99.9` or `90% / 1 ms` to mean "or" or "under":
+  write the full phrase. Say what "page you" means the first time (an on-call alert). When she
+  asks "I don't get X", rewrite X in the notes that same way, and treat the question as a
+  style bug to avoid next time.
 
 ## Commands
 
