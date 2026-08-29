@@ -54,6 +54,46 @@ an SLI. The natural structure is `SLI ≤ target` or `lower bound ≤ SLI ≤ up
     below), and **under-reliance**, when prospective users assume a system is flakier than it
     actually is.
 
+### SLI vs SLO
+
+The two names sound alike. They are not the same thing.
+
+| | SLI | SLO |
+|---|---|---|
+| Full name | Service level **indicator** | Service level **objective** |
+| What it is | The measurement. The ruler. | The target on that measurement. The mark on the ruler. |
+| Question it answers | "What number are we reading?" | "What number did we promise?" |
+| Example shape | a count, a rate, a percentile | `SLI` compared to a number |
+
+You cannot have an SLO without an SLI. The SLO is always:
+
+`the SLI` + `a comparison` + `a number`
+
+Example: SLI = share of well-formed write requests that succeed. Comparison = at least.
+Number = 99.9%. The SLO is `at least 99.9% of well-formed write requests succeed`.
+
+The SLI can be green or red only after you attach an SLO. A dashboard that says "success
+rate is 99.7%" is an SLI reading. It is not a miss until someone wrote "we promised 99.9%."
+
+**Paired examples** (same row = one relationship)
+
+| What users care about | SLI (what you count) | SLO (the promise) |
+|---|---|---|
+| Did the write work? | Share of well-formed write requests that succeed (the server did not fail) | At least 99.9% succeed |
+| Was the click fast? | Time from click to last byte, for small writes | 99 of 100 finish in 50 ms or less |
+| Did the nightly report arrive? | Time from job start to the file in the inbox | 999 of 1,000 finish by 08:00 |
+| Is the photo still there next year? | Share of written objects that still read back with a matching checksum | At least 99.99% still readable after 365 days |
+
+One SLI can feed more than one SLO. Same write-latency measurement. Pipeline promise: 95 of
+100 finish in 1 s or less. Click promise: 99 of 100 small writes finish in 10 ms or less.
+Two marks on the same ruler.
+
+Some SLIs never get an SLO. Incoming requests per second is a real measurement. Users choose
+that number, so you do not promise "we will receive 10,000 QPS." You still watch the graph.
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">SLI vs SLO</a>.
+
 ### The Global Chubby Planned Outage (case study)
 
 Global Chubby is Google's distributed lock service, replicated so each instance spans multiple
@@ -685,8 +725,9 @@ See
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
-  are the targets you set on those measurements. You need a good SLI before an SLO means
-  anything.
+  are the targets you set on those measurements. The SLO is always the SLI plus a comparison
+  plus a number. You need a good SLI before an SLO means anything. A 99.7% success reading
+  is not a miss until someone wrote the promise (for example 99.9%).
 - Treat metrics as distributions, not averages. An average latency can stay flat all day while
   p95 and p99 get 20× worse. Alert on the slow requests you care about, not the mean.
 - Standardize SLIs with reusable templates (availability, latency, throughput, durability,
@@ -739,6 +780,7 @@ See
 
 | Diagram | Open |
 | --- | --- |
+| **SLI vs SLO**: the ruler (what you count) and the mark (what you promised); four pairs, then one ruler with two marks | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
