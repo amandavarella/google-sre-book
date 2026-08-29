@@ -2,7 +2,7 @@
 
 > Part II. Principles of *Site Reliability Engineering* (Google / O'Reilly).
 >
-> Notes last synced 2026-08-28.
+> Notes last synced 2026-08-29.
 
 ---
 
@@ -454,6 +454,59 @@ Together they say: most requests finish in about 1 ms, almost all still finish i
 only a few may take as long as 100 ms. Service B above would miss the first two lines. See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Same SLO, two shapes</a>.
 
+**Two classes of work on the same write**
+
+A **heterogeneous workload** means mixed types of work on one API. Same `Set` call. Two
+different customers.
+
+An **RPC** (remote procedure call) is a function call that crosses the network: your code
+calls `Set` here, another machine does the write there. `Set` is the write. `Get` would be
+the read.
+
+The two customers want different things from that same `Set`:
+
+- **Throughput client:** a bulk pipeline. It wants many writes to finish per hour. Each write
+  can take up to 1 second. The person is not waiting on a click.
+- **Latency client:** a person waiting on a click (a phone, a form). Each *small* write must
+  feel instant.
+
+So you write two SLOs, not one:
+
+- `95% of Set RPC calls from throughput clients will complete in less than 1 s.`
+- `99% of Set RPC calls from latency clients, with payloads under 1 kB, will complete in
+  less than 10 ms.`
+
+**Payload** is the size of the data in the write. 1 kB is 1,024 bytes, about a short
+paragraph of text. The second line only counts those small writes.
+
+**Why two lines, not one number for every `Set`**
+
+| If you write… | What happens |
+|---|---|
+| One SLO: every `Set` under 10 ms | The pipeline fails every day. A 10 MB nightly dump cannot finish in 10 ms. On-call gets paged for healthy batch work. |
+| One SLO: every `Set` under 1 s | The phone can wait up to 1 second and the SLO stays green. No alert. The click feels broken. |
+| One mixed bucket of all `Set`s | The pipeline may send millions of large writes. Combined p99 (the time 99 of 100 finish in or less) looks like those large writes. The 10 ms clicks disappear in the pile. |
+
+**Why the latency line also says "payloads under 1 kB"**
+
+A 10 MB write from a phone cannot finish in 10 ms either. If you put large writes in the
+"fast click" SLO, that SLO is always red. The filter keeps that SLO about the writes a click
+actually sends. Large writes are measured under a different rule, or under the throughput
+SLO.
+
+**How you tell the two classes apart**
+
+A header, a client ID, a separate API key, or the payload-size filter. Monitoring must be
+able to split the requests. If every `Set` looks the same, you cannot apply two SLOs.
+
+**Why 95% on the pipeline and 99% on the click**
+
+The pipeline can accept 5 slow writes in 100. A person clicking cannot accept 5 slow clicks
+in 100. Only 1 in 100 clicks may miss 10 ms.
+
+This is the same idea as the "two user populations" note above, now with numbers. See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Two workload classes</a>.
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -474,6 +527,8 @@ only a few may take as long as 100 ms. Service B above would miss the first two 
 - One SLO pins one point on the distribution. Many shapes can pass `99% < 100 ms`. Use several
   targets (p90, p99, and p99.9) when both the typical request and the rare slow request matter
   to the product.
+- The same `Set` RPC can need two SLOs when two client classes want different things. A bulk
+  pipeline can wait 1 second. A person clicking cannot. Do not mix them into one bucket.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -501,6 +556,7 @@ only a few may take as long as 100 ms. Service B above would miss the first two 
 | **Latency percentiles**: Figure 4-1 redrawn: p50 stays near 50 ms while p99 spikes to 10 s; an average would hide that | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Two workload classes**: same `Set` RPC; pipeline 95% under 1 s, small clicks 99% under 10 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
