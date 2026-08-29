@@ -151,7 +151,7 @@
           <text x="240" y="284" fill="#08131f" font-size="14" font-family="'JetBrains Mono', monospace">11:00 · 28 ms</text>
           <text x="520" y="284" fill="#08131f" font-size="14" font-family="'JetBrains Mono', monospace">13:00 · 38</text>
           <text x="720" y="284" fill="#08131f" font-size="14" font-family="'JetBrains Mono', monospace">15:00 · 45</text>
-          <text x="60" y="326" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">A rise. Not a miss. A miss needs a promise. Is 45 ms a fire? Only a mark can say.</text>
+          <text x="60" y="326" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">The number went up 17 ms. That is not a miss. Fire means drop everything and add servers today. Only a mark can say if 45 ms is that.</text>
         </g>
 
         <g id="afternoon" class="layer">
@@ -179,13 +179,13 @@
           <text x="80" y="378" fill="#5EEAD4" font-size="14" font-family="'JetBrains Mono', monospace">TEAM A · MARK 50 MS</text>
           <text x="80" y="408" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">15:00 is 45 ms. Only 5 ms left.</text>
           <text x="80" y="432" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">If the rise holds, miss around 17:00.</text>
-          <text x="80" y="464" fill="#5EEAD4" font-size="16" font-family="'JetBrains Mono', monospace">ACT AT 15:00</text>
+          <text x="80" y="464" fill="#5EEAD4" font-size="16" font-family="'JetBrains Mono', monospace">FIRE · ACT AT 15:00</text>
 
           <rect x="560" y="348" width="480" height="140" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
           <text x="580" y="378" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">TEAM B · MARK 200 MS</text>
           <text x="580" y="408" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">15:00 is 45 ms. 155 ms still left.</text>
           <text x="580" y="432" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">50 ms at 17:00 is not their miss.</text>
-          <text x="580" y="464" fill="#F472B6" font-size="16" font-family="'JetBrains Mono', monospace">DO NOT ACT TODAY</text>
+          <text x="580" y="464" fill="#F472B6" font-size="16" font-family="'JetBrains Mono', monospace">NOT A FIRE · DO NOT ACT TODAY</text>
         </g>
       </svg>
       <div class="legend">
@@ -241,7 +241,7 @@ const steps = [
   },
   {
     title: 'Without the SLO you would not know when',
-    desc: 'The three readings alone are only "a bit slower." A miss needs a promise. Whether means: add servers today at all? When means: add them at 15:00, before the miss? Team A (mark 50 ms) has 5 ms left, so they act at 15:00. Team B (mark 200 ms) has 155 ms left, so they do not act today. Same SLI. Different action. No mark at all, and the argument never ends.',
+    desc: '28 ms, then 38 ms, then 45 ms. The number went up 17 ms. That is all. "A bit slower" means only that. "Fire" means page on-call and add servers this afternoon. 45 ms cannot be a fire until a promise exists. Team A (mark 50 ms): 5 ms left, miss around 17:00, so this is a fire, act at 15:00. Team B (mark 200 ms): 155 ms left, so this is not a fire, do not act today.',
     on: ['s1','s2'],
     extra: ['afternoonBare','noslo']
   }

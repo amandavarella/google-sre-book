@@ -770,8 +770,23 @@ Start with only the SLI. No mark on the ruler. The dashboard says:
 | 13:00 | 38 ms |
 | 15:00 | 45 ms |
 
-That is a rise. It is not a miss. A miss needs a promise. "A bit slower" is all you can
-say. Is 45 ms a fire? The graph cannot answer. Two people can argue all afternoon.
+Walk those three readings with no SLO on the wall.
+
+- **11:00, 28 ms.** 99 of 100 clicks finish in 28 ms or less. A fact. Not a pass. Not a miss.
+- **13:00, 38 ms.** Ten milliseconds worse than 11:00. You can say the number went up.
+- **15:00, 45 ms.** Another 7 ms worse. From 28 to 45 is 17 ms worse in four hours.
+
+**"A bit slower"** means only that: the number went up. 28 became 45. You have no rule
+that says "17 ms worse is enough to drop everything." You also have no rule that says
+"17 ms worse is fine." The graph is a story with no last page.
+
+**"Is 45 ms a fire?"** Fire here means an emergency: send an on-call alert (page you),
+stop other work, add servers *this afternoon*. The opposite of a fire is "interesting,
+watch it tomorrow."
+
+45 ms cannot be a fire by itself. Fire is "we are about to break a promise" or "we
+already broke it." No promise is written, so 45 ms is not a fire and not "fine." It is
+an unfinished sentence. Two people can argue all afternoon.
 
 **Whether** means: do we add servers *today at all*?  
 **When** means: if we add them, do we add them at 15:00 (while there is still room), or
@@ -792,8 +807,8 @@ That is roughly 4 ms per hour. 45 + 8 ms more (two hours) is about 53 ms. So if 
 changes, Team A crosses 50 ms around 17:00. Team B's 200 ms mark is still far away on
 that slope.
 
-Same SLI path. Different action. The SLO is what turned "a bit slower" into either "act
-at 15:00" or "do not act today."
+Same SLI path. Different action. The SLO is what turned "the number went up 17 ms" into
+either "this is a fire, act at 15:00" or "this is not a fire, do not act today."
 
 If *neither* team wrote an SLO, you are stuck at the argument. Some people add servers
 (maybe wasted work). Some people wait (maybe a real miss of a promise nobody wrote). The
