@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Error budget</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:720px; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px; align-items:start;}
+  @media(min-width:1100px){ .layout{grid-template-columns: 2.4fr 1fr;} }
+
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:14px; overflow:hidden;
+  }
+  svg{width:100%; height:auto; display:block;}
+
+  .layer{
+    opacity:0; pointer-events:none; transition:opacity 0.35s ease;
+  }
+  .layer.on{opacity:1; pointer-events:auto;}
+  .layer.dim{opacity:0.22; pointer-events:none;}
+
+  .side{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px;
+  }
+  .step-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--req);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .step-title{font-size:18px; font-weight:700; margin-bottom:8px; line-height:1.3;}
+  .step-desc{font-size:14px; color:var(--text-dim); line-height:1.55;}
+
+  .controls{display:flex; gap:8px; margin-top:16px;}
+  button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    background:#16283F; color:var(--text); border:1px solid var(--panel-border);
+    border-radius:6px; padding:9px 14px; cursor:pointer; transition:all 0.15s;
+  }
+  button:hover:not(:disabled){border-color:var(--req); color:var(--req);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--req); color:#08131f; border-color:var(--req); font-weight:700;}
+  button.primary:hover{filter:brightness(1.08);}
+
+  .progress{display:flex; gap:5px; margin-top:14px; flex-wrap:wrap;}
+  .progress span{
+    width:100%; max-width:16px; height:5px; border-radius:3px; background:#233149; cursor:pointer;
+  }
+  .progress span.done{background:var(--req);}
+  .progress span.now{outline:2px solid #fff; outline-offset:1px;}
+
+  .legend{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:12px; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Google SRE Workbook · Defining objectives</div>
+    <h1>Error budget</h1>
+    <p class="sub">SLO <strong>99.9% succeed</strong> means 999 of 1,000 must work. The leftover 1 may fail. That leftover is the budget. Do not set the leftover to 0.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <svg viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="eb-title eb-desc">
+        <title id="eb-title">Error budget</title>
+        <desc id="eb-desc">A bar of 1,000 requests: 999 succeed, 1 may fail. That one failure is the error budget. Later steps show why a 100 percent SLO freezes shipping, and how daily spend is itself an SLO.</desc>
+
+        <!-- Always-on axis labels -->
+        <text x="60" y="36" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace">1,000 SETS THIS WINDOW</text>
+
+        <!-- Success bar + fail tick (steps 1-2) -->
+        <g id="bar-slo" class="layer">
+          <rect x="60" y="52" width="930" height="36" rx="4" fill="#5EEAD4"/>
+          <rect x="990" y="52" width="50" height="36" rx="4" fill="#FBBF24"/>
+          <text x="520" y="76" fill="#08131f" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">999 succeed · 99.9%</text>
+          <text x="1015" y="76" fill="#08131f" font-size="12" font-family="'JetBrains Mono', monospace" text-anchor="middle">1</text>
+          <text x="60" y="112" fill="#5EEAD4" font-size="13" font-family="'Inter', sans-serif">Product SLO: 99.9% of Sets succeed</text>
+          <text x="1015" y="112" fill="#FBBF24" font-size="13" font-family="'Inter', sans-serif" text-anchor="middle">may fail</text>
+        </g>
+
+        <g id="callout-budget" class="layer">
+          <path d="M1015 88 L1015 140" stroke="#FBBF24" stroke-width="1.6"/>
+          <rect x="780" y="140" width="260" height="64" rx="8" fill="#16283F" stroke="#FBBF24" stroke-width="1.4"/>
+          <text x="910" y="166" fill="#FBBF24" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">ERROR BUDGET</text>
+          <text x="910" y="188" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">1 − SLO = 0.1% = 1 Set</text>
+        </g>
+
+        <!-- 100% trap -->
+        <g id="trap-100" class="layer">
+          <rect x="60" y="140" width="980" height="100" rx="8" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="550" y="172" fill="#F472B6" font-size="15" font-family="'JetBrains Mono', monospace" text-anchor="middle">100% SLO MEANS BUDGET = 0</text>
+          <text x="550" y="196" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Unrealistic: something always fails, so the SLO is a lie.</text>
+          <text x="550" y="220" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Undesirable: you freeze deploys, and you buy extra nines. The 99.9% users already see does not change.</text>
+        </g>
+
+        <!-- Week spend -->
+        <g id="week" class="layer">
+          <text x="60" y="268" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace">ONE WEEK · 1,000 ALLOWED FAILURES</text>
+          <rect x="60" y="284" width="980" height="28" rx="4" fill="#0F1A2B" stroke="#26374F"/>
+          <rect x="60" y="284" width="784" height="28" rx="4" fill="#FBBF24"/>
+          <rect x="844" y="284" width="49" height="28" fill="#FBBF24" opacity="0.55"/>
+          <rect x="893" y="284" width="39" height="28" rx="0" fill="#5EEAD4" opacity="0.45"/>
+          <text x="450" y="303" fill="#08131f" font-size="13" font-family="'JetBrains Mono', monospace">Mon 800</text>
+          <text x="868" y="303" fill="#08131f" font-size="11" font-family="'JetBrains Mono', monospace" text-anchor="middle">Tue 50</text>
+          <text x="60" y="336" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">Monday spent 800 of 1,000. 200 left. You still have time to steer.</text>
+        </g>
+
+        <!-- Two clocks -->
+        <g id="clocks" class="layer">
+          <rect x="60" y="360" width="470" height="88" rx="8" fill="#16283F" stroke="#5EEAD4" stroke-width="1.4"/>
+          <text x="295" y="390" fill="#5EEAD4" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">TEAM CLOCK</text>
+          <text x="295" y="414" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Every day, or every week</text>
+          <text x="295" y="434" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Steer while budget remains</text>
+          <rect x="570" y="360" width="470" height="88" rx="8" fill="#16283F" stroke="#F472B6" stroke-width="1.4"/>
+          <text x="805" y="390" fill="#F472B6" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">MANAGEMENT CLOCK</text>
+          <text x="805" y="414" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Every month, or every quarter</text>
+          <text x="805" y="434" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Same number, zoomed out</text>
+        </g>
+
+        <!-- Meta SLO -->
+        <g id="meta" class="layer">
+          <rect x="60" y="360" width="980" height="88" rx="8" fill="#0F1A2B" stroke="#FBBF24" stroke-width="1.6"/>
+          <text x="550" y="392" fill="#FBBF24" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">BUDGET SLO  ·  an SLO on the other SLOs</text>
+          <text x="550" y="418" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">Product SLO: 99.9% of Sets succeed. Budget SLO: this week, failed Sets stay at or under 0.1%.</text>
+          <text x="550" y="438" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">The SLI is how much of the allowance you have used. The target is do not use more than 100% of it.</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--req)"></i>succeed, inside the SLO</span>
+        <span><i class="swatch" style="background:var(--res)"></i>allowed miss, the budget</span>
+        <span><i class="swatch" style="background:var(--gslb); height:0; border-top:2px dashed var(--gslb); width:18px;"></i>100% trap</span>
+        <span><i class="swatch" style="background:var(--gslb)"></i>management clock</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="step-tag" id="stepTag">Step 1 of 6</div>
+        <div class="step-title" id="stepTitle"></div>
+        <div class="step-desc" id="stepDesc"></div>
+        <div class="controls">
+          <button id="prevBtn">◀ Back</button>
+          <button id="nextBtn" class="primary">Next ▶</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Chapter 4 · Service Level Objectives · <a href="https://sre.google/sre-book/service-level-objectives/">book chapter</a></footer>
+</div>
+
+<script>
+const steps = [
+  {
+    title: '999 of 1,000 must succeed',
+    desc: 'The product SLO is 99.9% of Sets succeed. In 1,000 Sets, 999 work. One may fail. That is not a bug in the SLO. It is the leftover the SLO already named.',
+    on: ['bar-slo']
+  },
+  {
+    title: 'That leftover 1 is the error budget',
+    desc: 'Error budget means the allowed miss rate. Chapter 3 wrote it as 1 minus the SLO. Here that is 0.1%, which is 1 Set in 1,000. You spend this 1 on purpose: a risky launch, a planned outage, a faster week of deploys.',
+    on: ['bar-slo', 'callout-budget']
+  },
+  {
+    title: 'A 100% SLO sets the leftover to 0',
+    desc: 'Unrealistic: something always fails, so the SLO is a lie. Undesirable: you freeze deploys (innovation slows) and you buy extra regions and extra review (expensive, conservative). The 99.9% users already see does not change. The bill does.',
+    on: ['bar-slo', 'trap-100']
+  },
+  {
+    title: 'Watch the spend every day or every week',
+    desc: 'Same math on 1,000,000 Sets: 0.1% is 1,000 allowed failures this week. Monday used 800. 200 remain. You can still steer on Tuesday. If you only look at the quarter, the quarter is already over.',
+    on: ['bar-slo', 'callout-budget', 'week']
+  },
+  {
+    title: 'Management wants a coarser clock',
+    desc: 'The team clock is daily or weekly, so you can change course. Upper management wants monthly or quarterly. That is the same allowance, zoomed out. Not a second budget. A second report.',
+    on: ['bar-slo', 'week', 'clocks']
+  },
+  {
+    title: 'The budget is an SLO on the other SLOs',
+    desc: 'Product SLO: 99.9% of Sets succeed. Budget SLO: this week, failed Sets stay at or under 0.1%. The SLI is how much of the allowance you have used. The target is do not use more than 100% of it. Two layers. One leftover.',
+    on: ['bar-slo', 'callout-budget', 'week', 'meta']
+  }
+];
+
+let current = 0;
+let playing = false;
+let playTimer = null;
+
+const ids = ['bar-slo','callout-budget','trap-100','week','clocks','meta'];
+const els = {};
+ids.forEach(id => { els[id] = document.getElementById(id); });
+
+const progressEl = document.getElementById('progress');
+steps.forEach((s,i)=>{
+  const d = document.createElement('span');
+  d.addEventListener('click', ()=> goTo(i));
+  progressEl.appendChild(d);
+});
+
+function render(){
+  const s = steps[current];
+  ids.forEach(id => {
+    els[id].classList.remove('on');
+    if(s.on.includes(id)) els[id].classList.add('on');
+  });
+
+  document.getElementById('stepTag').textContent = 'Step ' + (current+1) + ' of ' + steps.length;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').textContent = s.desc;
+
+  [...progressEl.children].forEach((d,i)=>{
+    d.classList.toggle('now', i===current);
+    d.classList.toggle('done', i<=current);
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===steps.length-1;
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(steps.length-1, i));
+  render();
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playing){
+    playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+    return;
+  }
+  playing=true; playBtn.textContent='⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(current>=steps.length-1){
+      playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+      return;
+    }
+    goTo(current+1);
+  }, 2200);
+});
+
+render();
+</script>
+</body>
+</html>

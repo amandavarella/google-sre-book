@@ -507,6 +507,67 @@ in 100. Only 1 in 100 clicks may miss 10 ms.
 This is the same idea as the "two user populations" note above, now with numbers. See
 <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Two workload classes</a>.
 
+**Do not require the SLO 100% of the time. Keep an error budget.**
+
+An **error budget** is the allowed miss rate. Chapter 3 wrote it as `1 − SLO`. Same number,
+now used as a daily working limit.
+
+Example: the SLO is `99.9% of Sets succeed`. In 1,000 Sets, 999 must succeed. The leftover
+**1 Set may fail**. That 1 is the budget.
+
+A 100% SLO means the leftover is 0. That is both impossible and a bad product choice.
+
+- **Unrealistic.** Something always fails: a deploy, a network blip, a bad payload. You will
+  miss. Then the SLO is a lie.
+- **It slows shipping.** Any failure is a miss. Teams freeze deploys. New features wait.
+- **It gets expensive.** You buy extra regions, extra replicas, extra review gates, so nothing
+  can fail. The success rate users already see (99.9%) does not change. The bill does.
+
+So you write the miss on purpose. Then you **spend** it on purpose: a risky launch, a planned
+Chubby outage, a week of faster deploys. The budget is the room to take those risks without
+breaking the promise.
+
+**Watch the spend on two clocks**
+
+| Who | How often | Why |
+|---|---|---|
+| The team | Every day, or every week | You can still steer. Monday used 80 of 100 allowed misses. You slow deploys on Tuesday. |
+| Upper management | Every month, or every quarter | Same number, zoomed out. The board does not need Monday. They need "this quarter we stayed inside 0.1%." |
+
+Daily and weekly are not a different SLO. They are a finer grain of the same allowance. If you
+only look once a quarter, the quarter is already over when you see you overspent.
+
+**"An error budget is just an SLO for meeting other SLOs"**
+
+That line packs two layers. Split them.
+
+- **Product SLO** (the one users feel): `99.9% of Sets succeed.`
+- **Budget SLO** (the one the team watches): `this week, the share of failed Sets will stay at
+  or under 0.1%.`
+
+The second line is itself an SLO. The SLI is "how much of the allowance have we used." The
+target is "do not use more than 100% of the allowance." You are setting an objective on
+whether you are still meeting the other objectives.
+
+Worked week: 1,000,000 Sets. 0.1% of that is 1,000 allowed failures.
+
+| Day | Failures | Budget left (of 1,000) |
+|---|---|---|
+| Monday | 800 | 200 |
+| Tuesday | 50 | 150 |
+| Wednesday–Sunday | 40 | 110 |
+
+Monday did not break the product SLO by itself. It spent most of the week's budget SLO. Daily
+tracking is what makes that visible on Monday, not in the quarterly report.
+
+If the week ends at 0 left, you stop spending (freeze risky deploys) until the next window
+refills the allowance. If the quarter ends with budget left, that leftover is what the Chubby
+planned outage spends on purpose (see that case study above). Leftover is not a bonus. It is
+unspent risk that other teams start to depend on.
+
+See
+<a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Error budget</a>.
+
 ## Key takeaways
 
 - SLIs are the measurements (latency, error rate, throughput, availability, durability); SLOs
@@ -529,6 +590,10 @@ This is the same idea as the "two user populations" note above, now with numbers
   to the product.
 - The same `Set` RPC can need two SLOs when two client classes want different things. A bulk
   pipeline can wait 1 second. A person clicking cannot. Do not mix them into one bucket.
+- Do not require an SLO 100% of the time. The leftover (`1 − SLO`) is the **error budget**:
+  allowed misses you spend on purpose. Track the spend every day or every week so you can
+  steer. A month or quarter rollup is for management. That "stay inside the allowance" line
+  is itself an SLO on the other SLOs.
 - Prefer measuring what users actually experience over what's convenient to measure (client-side
   latency over server-side, for instance), and fall back to a proxy only when the real thing is
   out of reach.
@@ -557,6 +622,7 @@ This is the same idea as the "two user populations" note above, now with numbers
 | **Mean vs median**: 100 requests, timeout at 1 s, in six steps: chopped tail, false outliers, hidden hangs | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Same SLO, two shapes**: both services pass `99% < 100 ms`; only one has p90 at 1 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">Open</a> |
 | **Two workload classes**: same `Set` RPC; pipeline 95% under 1 s, small clicks 99% under 10 ms | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">Open</a> |
+| **Error budget**: 99.9% succeed means 1 of 1,000 may fail; that leftover is the spend you track | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">Open</a> |
 
 Open the HTML in a browser. Obsidian and GitHub markdown will not run the clicks.
 
