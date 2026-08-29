@@ -413,7 +413,8 @@ See
 - SLI = the measurement. SLO = the mark on that measurement (`SLI` + a comparison + a number).
   SLA = an SLO plus a consequence for missing it.
 - Treat latency as a distribution, not an average. Percentiles show the tail. Do not assume
-  a bell curve (see [Mean vs median](https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html)).
+  a bell curve (see
+  <a href="https://amandavarella.github.io/google-sre-book/chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">Mean vs median</a>).
 - Start from what users care about, then pick indicators. Standardize SLIs with house
   templates so a short SLO is not a weaker promise.
 - One SLO pins one point. Use a stack, or two SLOs on the same `Set`, when typical and tail
