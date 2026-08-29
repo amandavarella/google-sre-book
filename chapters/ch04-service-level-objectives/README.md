@@ -628,10 +628,27 @@ The 50 ms line did the job: two teams disagreed, and the pre-agreed number picke
 next step. That is all "win an argument" means. It is not about being louder. It is
 about pointing at a number everyone already accepted.
 
-Now look at `CPU idle stays above 40%`. CPU idle is unused processor time. 40% idle means
-the machines are busy only 60% of the time. Useful for capacity planning. In this meeting
-nobody said "the filter is fine, idle is 55%." The launch did not move because of that
-line. So it is not an SLO. Keep the graph. Drop it from the SLO list.
+That is the whole filter story. CPU idle is not a second part of that problem.
+
+**Why CPU idle is on the slide at all**
+
+The book also said: have as few SLOs as possible. So you run the *same meeting test* on
+other lines people might want to promote to an SLO.
+
+**CPU idle** is unused processor time. 55% idle means the machines are busy only 45% of
+the time. That is a useful capacity graph (do we need more machines?). It does not tell
+you if the click will stay under 50 ms.
+
+In the Friday meeting, two numbers were in the room:
+
+| Number | Did it change ship or wait? | Then it is… |
+|---|---|---|
+| 99% of clicks under 50 ms | Yes. 100 > 50, so wait. | An SLO. Keep it. |
+| CPU idle is 55% | No. Nobody said "idle is fine, ship the filter." | A graph. Not an SLO. |
+
+The pink box is the second row. Its goal is not to fix the filter. Its goal is to show a
+line that fails the meeting test, so you do not add it to the SLO list. You can still
+open the idle graph next week when you plan machines.
 
 **User delight** fails the same test for a different reason. Delight has no shared ruler.
 Two people will not agree that "delight is 80." You cannot send an on-call alert

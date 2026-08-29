@@ -153,9 +153,10 @@
           <text x="580" y="186" fill="#8FA1BC" font-size="13" font-family="'Inter', sans-serif">Do not turn the filter on for everyone.</text>
           <text x="580" y="206" fill="#8FA1BC" font-size="13" font-family="'Inter', sans-serif">Cut the extra 80 ms (20 + 25 = 45), then ship.</text>
 
-          <rect x="40" y="248" width="1020" height="72" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
-          <text x="60" y="278" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">NOT USED IN THIS MEETING</text>
-          <text x="60" y="304" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif">CPU idle is 55% (machines are busy only 45% of the time). Nobody used that number to say ship or wait. Keep the graph. It is not an SLO.</text>
+          <rect x="40" y="248" width="1020" height="88" rx="10" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="60" y="276" fill="#F472B6" font-size="14" font-family="'JetBrains Mono', monospace">CONTRAST · NOT PART OF THE FILTER MATH</text>
+          <text x="60" y="300" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">CPU idle is 55%. That is unused machine time. It does not say if the click stays under 50 ms.</text>
+          <text x="60" y="322" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif">Same meeting, second number. It did not change wait. Keep it as a graph. Do not make it an SLO.</text>
         </g>
 
         <g id="delight" class="layer">
@@ -211,7 +212,7 @@ const steps = [
   },
   {
     title: 'Keep an SLO if it changes ship or wait',
-    desc: 'Today a click is about 20 ms. The filter adds 80 ms. That is 100 ms. The promise is 99% under 50 ms. 100 is bigger than 50, so you wait: do not turn the filter on for everyone. The 20 ms click is already fine. The filter team cuts the extra 80 ms (example: 20 + 25 = 45), then you ship. CPU idle is 55% this week. Nobody used that number. Keep the graph. It is not an SLO.',
+    desc: 'Today a click is about 20 ms. The filter adds 80 ms. That is 100 ms. The promise is 99% under 50 ms. 100 is bigger than 50, so you wait: do not turn the filter on for everyone. The filter team cuts the extra 80 ms, then you ship. The pink box is a contrast, not a second filter problem. CPU idle is unused machine time. It did not change wait, so it stays a graph, not an SLO.',
     on: ['meet']
   },
   {
