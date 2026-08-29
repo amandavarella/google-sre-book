@@ -11,8 +11,87 @@ If `AGENTS.local.md` exists at the repo root, read it for personal shortcuts and
 A personal learning repo for Google's *Site Reliability Engineering* book: markdown notes plus
 self-contained interactive HTML diagrams, published to GitHub Pages.
 
+When this folder is the Cursor workspace, **this file is the source of truth**. Read
+"How she learns" before writing notes or answering a stuck question. Do not run `em-learning`
+or write chapter notes back to Obsidian.
+
 There is no build system, no package manager, no test suite, and no linter. Nothing is compiled
 or bundled: what is in the repo is exactly what gets served. Do not add a toolchain unless asked.
+
+## How she learns
+
+Derived from the Chapter 3–4 sessions. This is the working model for notes, diagrams, and chat.
+`em-learning` (Obsidian capture) is not the workflow for this repo. GitHub is the notes home.
+
+### The loop
+
+1. She pastes a book passage, or names a section. Write notes for **that passage only**. Do not
+   pull the next unread section. The goal is not to reproduce the book.
+2. Answer in chat first (short, concrete). Then put the same rewrite into the chapter `README.md`.
+   Chat-only explanations get lost. The note is what she studies later.
+3. When she says **"I don't get X"** (or "not clear", "what does that mean", "I don't understand
+   this part at all"): rewrite X in the notes. Then scan **only the rest of the current chapter
+   after that passage** for the same kind of packed word, and fix those too. Do not rewrite
+   earlier sections she has already accepted.
+4. When she says she understands, or **"add this block as a whole"**: stop unpacking that
+   passage. Move on.
+
+Each stuck question is a permanent style rule. If a metaphor, slash, or word failed once, do
+not use it again in this chapter.
+
+### What unsticks her
+
+She does not learn from a second abstract restatement of the book. She learns when the idea
+becomes a **decision with numbers**.
+
+- **Same running example** across a walkthrough (100 requests and a 1 s timeout; the Friday
+  filter meeting `20 + 80 = 100` vs a 50 ms promise; the 28 → 38 → 45 ms afternoon). Reuse
+  those numbers. Do not invent a fresh story for each paragraph.
+- **Two contrasting cases** on the same reading: Team A’s 50 ms mark vs Team B’s 200 ms mark;
+  photo app vs archive; pipeline vs click. She gets the idea when two people see one number
+  and do different things.
+- **Whether and when.** She tests a sentence by asking what it *does*. "Spent the error budget
+  on batch jobs": did we spend it wrong, or on purpose? "DECISION: WAIT": is the goal to give
+  SRE time to make the click faster? (No: wait means do not ship; product cuts the extra 80 ms.)
+  "CPU idle is not used in this meeting": why is that box on the slide at all? Always answer
+  the action: ship, wait, page, add servers today, or leave it as a graph.
+- **Why next to the claim.** Put the reason in the same bullet (a short parenthesis is fine),
+  not in a later paragraph. Same for examples: if a line is abstract ("defuses discussions",
+  "service tiers at different costs"), attach a concrete example in that line.
+- **Step by step, then a diagram.** Chubby, percentiles, the control loop: first unpack in
+  order, then a step-through diagram with the same numbers. Link the diagram **inline** next
+  to the passage, not only in the chapter table.
+- **Draw the shape.** Never say "pretend" or "imagine" a curve. If the claim is "this looks
+  like a bell curve," put the curve on the chart. Scaffolding she no longer needs (an extra
+  histogram) can be removed after she says she gets it.
+
+### What fails (do not write these)
+
+- Packed metaphors and cinematic lines: "trains every user to wait", "nobody in the room can
+  feel", "two humps", "thin tail" with no numbers.
+- Slash-as-or: never `p99 / p99.9` or `90% / 1 ms` to mean "or" or "under". Write the full
+  phrase.
+- "Beat" for a percentile. Say "finished in that time or less."
+- Undefined jargon: `p90`, `p99`, HTTP 500, RPC, payload, error budget, "page you" (on-call
+  alert). Define the first time, in the sentence that uses it.
+- Asking her to hold a picture that is not drawn.
+- Quoting the book at length. She wants a **condensed, clearer** version than the page, in
+  her words for later study.
+
+### How she reads the page
+
+- Headings must match the **book’s section titles** and be prominent (`##` for the book’s
+  major parts, `###` for the book’s subsections). A wall of `####` under a generic `## Notes`
+  hides the outline she is following in the book.
+- She notices broken lists, misaligned bullets, and formulas that smash the layout. She will
+  paste a screenshot. Fix the render, not only the wording.
+- Diagram type: Inter for any caption she must study. House dark palette (copy Chapter 2).
+  New-tab live Pages links.
+
+### Photos and highlights
+
+If she sends a photographed page with **highlighted text or brackets in the margin**, extract
+only those bits. The rest of the page is context, not the note.
 
 ## Teaching language (this book)
 
