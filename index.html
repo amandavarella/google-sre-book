@@ -125,82 +125,6 @@
     </p>
   </header>
 
-  <h2>Interactive diagrams</h2>
-  <div class="feature-grid">
-    <a class="feature" href="chapters/ch02-production-environment/diagrams/life-of-a-request.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 2</span>
-      <h3>Life of a Request</h3>
-      <p>Step through a Shakespeare search from the click to the rendered page — including the browser as the real go-between, and the full trip back.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>SLI vs SLO</h3>
-      <p>The SLI is the ruler. The SLO is the mark. 99.7% succeed is a reading. It is a miss only after you promised 99.9%.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Latency percentiles</h3>
-      <p>p50 stays near 50 ms. p99 spikes to 10 s. An average of the same window looks unchanged.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Mean vs median</h3>
-      <p>Walk 100 requests with a 1 s timeout. Mean leaves the median. The chopped tail creates false outliers and hides real hangs.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Same SLO, two shapes</h3>
-      <p>Both services pass 99% under 100 ms. Only one feels instant. One target cannot pin the shape of the curve.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Two workload classes</h3>
-      <p>Same Set RPC. A pipeline can wait 1 s. A small click cannot. One number cannot serve both.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Error budget</h3>
-      <p>99.9% succeed means 1 of 1,000 may fail. That leftover is the spend. A 100% SLO sets it to 0.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Choosing targets</h3>
-      <p>Do not copy tonight's 10 ms if heroes produce it. Keep a line as an SLO only if people use it to decide ship or wait.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Control loop</h3>
-      <p>Measure, compare, decide, act. Same 28 ms to 45 ms rise: act at 15:00 if the mark is 50 ms. Do not act today if the mark is 200 ms.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>SLOs set expectations</h3>
-      <p>Same offer: cheap, keep the file, sometimes down. Photo app says no. Archive says yes.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Safety margin</h3>
-      <p>Users see 100 ms. You act at 80 ms. The 20 ms gap is time to fix a creep before they see a miss.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">
-      <span class="tag">Chapter 4</span>
-      <h3>Invest where</h3>
-      <p>Red or budget almost gone: fix the service. Green and budget left: features and debt, not 28 ms to 20 ms.</p>
-      <span class="go">Open diagram →</span>
-    </a>
-  </div>
-
   <h2>Chapters</h2>
   <div class="part">Part I. Introduction</div>
   <ol class="chapters">
@@ -232,6 +156,7 @@
     <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch05-eliminating-toil/README.md">
       <span class="num">05</span>
       <span class="title">Eliminating Toil</span>
+      <span class="badge notes">notes</span>
     </a></li>
     <li><a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch06-monitoring-distributed-systems/README.md">
       <span class="num">06</span>
@@ -359,6 +284,82 @@
       <span class="title">Conclusion</span>
     </a></li>
   </ol>
+
+  <h2>Interactive diagrams</h2>
+  <div class="feature-grid">
+    <a class="feature" href="chapters/ch02-production-environment/diagrams/life-of-a-request.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 2</span>
+      <h3>Life of a Request</h3>
+      <p>Step through a Shakespeare search from the click to the rendered page — including the browser as the real go-between, and the full trip back.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/sli-vs-slo.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>SLI vs SLO</h3>
+      <p>The SLI is the ruler. The SLO is the mark. 99.7% succeed is a reading. It is a miss only after you promised 99.9%.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/latency-percentiles.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Latency percentiles</h3>
+      <p>p50 stays near 50 ms. p99 spikes to 10 s. An average of the same window looks unchanged.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/statistical-fallacies.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Mean vs median</h3>
+      <p>Walk 100 requests with a 1 s timeout. Mean leaves the median. The chopped tail creates false outliers and hides real hangs.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/same-slo-two-shapes.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Same SLO, two shapes</h3>
+      <p>Both services pass 99% under 100 ms. Only one feels instant. One target cannot pin the shape of the curve.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/two-workload-classes.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Two workload classes</h3>
+      <p>Same Set RPC. A pipeline can wait 1 s. A small click cannot. One number cannot serve both.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/error-budget.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Error budget</h3>
+      <p>99.9% succeed means 1 of 1,000 may fail. That leftover is the spend. A 100% SLO sets it to 0.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/choosing-targets.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Choosing targets</h3>
+      <p>Do not copy tonight's 10 ms if heroes produce it. Keep a line as an SLO only if people use it to decide ship or wait.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/control-loop.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Control loop</h3>
+      <p>Measure, compare, decide, act. Same 28 ms to 45 ms rise: act at 15:00 if the mark is 50 ms. Do not act today if the mark is 200 ms.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/slo-expectations.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>SLOs set expectations</h3>
+      <p>Same offer: cheap, keep the file, sometimes down. Photo app says no. Archive says yes.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/safety-margin.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Safety margin</h3>
+      <p>Users see 100 ms. You act at 80 ms. The 20 ms gap is time to fix a creep before they see a miss.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+    <a class="feature" href="chapters/ch04-service-level-objectives/diagrams/invest-where.html" target="_blank" rel="noopener noreferrer">
+      <span class="tag">Chapter 4</span>
+      <h3>Invest where</h3>
+      <p>Red or budget almost gone: fix the service. Green and budget left: features and debt, not 28 ms to 20 ms.</p>
+      <span class="go">Open diagram →</span>
+    </a>
+  </div>
 
   <footer>
     Notes and redrawn diagrams by <a href="https://github.com/amandavarella">Amanda Varella</a> ·
