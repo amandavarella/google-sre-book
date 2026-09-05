@@ -36,25 +36,60 @@ Derived from the Chapter 3–4 sessions. This is the working model for notes, di
 4. When she says she understands, or **"add this block as a whole"**: stop unpacking that
    passage. Move on.
 
+**Capture and organize. Do not add opinions.** The notes are her study copy of the book,
+arranged so she can reread it. They are not a playbook you wrote.
+
+- Organize: the book's headings, bullets, short sentences, jargon defined in the same line,
+  numbers that are in the passage.
+- Do not add advice, `DECISION:` lines, extra process ("at year end, add up hours"), or
+  "you should" that she did not paste and the book did not state.
+- If the book itself states an action (for example ship or wait on an error budget), keep
+  that action. Do not invent a new one.
+
+Organizing uses the safeguards from
+[Clarity](https://github.com/addyosmani/clarity/blob/main/SKILL.md) (rewrite of source
+material into explanation and reference). Full Clarity modes, interview, lint scripts, and
+essay-voice matching are **not** in this repo.
+
+- **Inventory first.** List the passage's claims, numbers, examples, and terms. Then
+  organize. Do not add a claim, number, cause, or anecdote that was not in the paste.
+- **Register.** These notes are explanation (accurate mechanism at her level) plus
+  reference (scannable headings). They are not an argument. Do not invent a thesis.
+- **Least invasive.** Cut, reorder, and shorten for comprehension. A clearer sentence must
+  still mean what the book meant. Do not strengthen, hedge, or drop a condition.
+- **Ask the gap.** If a clearer sentence needs a fact she did not paste, ask in chat. Do
+  not invent it, and do not put `[TK]` into the published notes.
+- **Attribution.** Keep "the book says" separate from anything else. Do not silently turn
+  a Google SRE practice into a rule for her job.
+- **Stop on the last useful thought.** Do not add a recap, moral, or send-off after the
+  passage is organized. The Key takeaways section at the bottom of the file is the stub
+  summary; update it with claims from the passage, not a second essay.
+
 Each stuck question is a permanent style rule. If a metaphor, slash, or word failed once, do
 not use it again in this chapter.
 
 ### What unsticks her
 
 She does not learn from a second abstract restatement of the book. She learns when the idea
-becomes a **decision with numbers**.
+becomes a **decision with numbers** that are already in the passage (or in earlier linked
+notes). Do not invent a new number to make the point land.
 
 - **Same running example** across a walkthrough (100 requests and a 1 s timeout; the Friday
   filter meeting `20 + 80 = 100` vs a 50 ms promise; the 28 → 38 → 45 ms afternoon). Reuse
-  those numbers. Do not invent a fresh story for each paragraph.
+  those numbers. Do not invent a fresh story for each paragraph. The example must already
+  exist in the pasted passage or in earlier notes. If it comes from an earlier chapter, link
+  that chapter (and its diagram, if there is one) on first use. Do not invent a new fictional
+  incident to teach the passage.
 - **Two contrasting cases** on the same reading: Team A’s 50 ms mark vs Team B’s 200 ms mark;
   photo app vs archive; pipeline vs click. She gets the idea when two people see one number
-  and do different things.
+  and do different things. Use two cases when the passage or earlier notes already have
+  them. Do not invent a Team A and Team B the book did not write.
 - **Whether and when.** She tests a sentence by asking what it *does*. "Spent the error budget
   on batch jobs": did we spend it wrong, or on purpose? "DECISION: WAIT": is the goal to give
   SRE time to make the click faster? (No: wait means do not ship; product cuts the extra 80 ms.)
-  "CPU idle is not used in this meeting": why is that box on the slide at all? Always answer
-  the action: ship, wait, page, add servers today, or leave it as a graph.
+  "CPU idle is not used in this meeting": why is that box on the slide at all? Answer the
+  action **only when the passage states it**: ship, wait, page, add servers today, or leave it
+  as a graph. Do not invent a `DECISION:` or a weekly ritual the book did not write.
 - **Why next to the claim.** Put the reason in the same bullet (a short parenthesis is fine),
   not in a later paragraph. Same for examples: if a line is abstract ("defuses discussions",
   "service tiers at different costs"), attach a concrete example in that line.
@@ -77,6 +112,8 @@ becomes a **decision with numbers**.
 - Undefined jargon: `p90`, `p99`, HTTP 500, RPC, payload, error budget, "page you" (on-call
   alert). Define the first time, in the sentence that uses it.
 - Asking her to hold a picture that is not drawn.
+- Opinions, invented `DECISION:` lines, extra process, anecdotes, or numbers that are not in
+  the pasted passage.
 - Quoting the book at length. She wants a **condensed, clearer** version than the page, in
   her words for later study.
 
@@ -89,6 +126,10 @@ becomes a **decision with numbers**.
   paste a screenshot. Fix the render, not only the wording.
 - Diagram type: Inter for any caption she must study. House dark palette (copy Chapter 2).
   New-tab live Pages links.
+- **Link every cross-reference.** If a note or a chat reply names another chapter, section,
+  diagram, or file in this repo, put a clickable link in that same sentence. Do not write
+  "see Chapter 4" with no URL. First mention in a file is enough; later "same photo app"
+  in that file can stay unlinked. URL shapes are under "Cross-references" below.
 
 ### Photos and highlights
 
@@ -110,16 +151,18 @@ English is a second language. Write so a careful reader can study without decodi
 - Prefer concrete numbers and the same example across a walkthrough (for example the 100-request
   latency set) over abstract restatement.
 - Never use em dashes. Use a comma, colon, or a new sentence.
-- **Anticipate the next question.** If a sentence packs two ideas (for example "fine at p99 and
-  sluggish at p90"), unpack it before she has to ask: say what p90 and p99 *are*, then say who
-  feels each one, then say why that matters. Do not write lines like "nobody in the room can
-  feel" or "trains every user to wait". Say which number does not change. Do not write
-  `p99 / p99.9` or `90% / 1 ms` to mean "or" or "under": write the full phrase. Say what
-  "page you" means the first time (an on-call alert). Never
-  use "beat" for a percentile: say "finished in that time or less." When she asks "I don't get
-  X", rewrite X in the notes, then scan the *rest of the current chapter after that passage*
-  for the same kind of packed word (another metaphor, another slash, another undefined `pNN`)
-  and fix those too. Do not rewrite earlier sections she has already worked through.
+- **Anticipate the next question.** If a sentence in the *passage* packs two ideas (for
+  example "fine at p99 and sluggish at p90"), unpack those words before she has to ask: say
+  what p90 and p99 *are*, then say who feels each one, then say why that matters. Do not
+  write lines like "nobody in the room can feel" or "trains every user to wait". Say which
+  number does not change. Do not write `p99 / p99.9` or `90% / 1 ms` to mean "or" or
+  "under": write the full phrase. Say what "page you" means the first time (an on-call
+  alert). Never use "beat" for a percentile: say "finished in that time or less." Unpack
+  only what the passage already contains. Do not add answers to questions the passage does
+  not raise. When she asks "I don't get X", rewrite X in the notes, then scan the *rest of
+  the current chapter after that passage* for the same kind of packed word (another
+  metaphor, another slash, another undefined `pNN`) and fix those too. Do not rewrite
+  earlier sections she has already worked through.
 
 ## Commands
 
@@ -175,6 +218,23 @@ opens in a new tab. Plain markdown `[text](url)` stays in the same tab.
 Chapter rows in `index.html` deliberately link to the GitHub blob URL, not a relative path:
 Pages serves raw markdown as a download, whereas GitHub renders it. The feature cards in
 `index.html` are already live relative paths and stay that way.
+
+## Cross-references
+
+When notes or chat name another part of this repo, link it in the same sentence.
+
+Use an HTML `<a>` with `target="_blank"` and `rel="noopener noreferrer"`. Plain markdown
+`[text](url)` stays in the same tab.
+
+- **Diagrams:** live Pages URL, as in "Adding a diagram" above.
+- **Chapter notes** (a `README.md` in another chapter, or a heading in this one): GitHub
+  blob URL, plus a heading anchor when you mean a section, not the whole file. Same reason
+  as the chapter list in `index.html`: Pages would serve the markdown as a download.
+
+  `https://github.com/amandavarella/google-sre-book/blob/main/chapters/chNN-slug/README.md#heading-id`
+
+Same-file anchors (`[The Global Chubby Planned Outage](#the-global-chubby-planned-outage)`)
+are fine with no blob URL.
 
 ## Diagram conventions
 
