@@ -4,6 +4,54 @@
 
 ---
 
+## Black-Box Versus White-Box
+
+**Definitions** (from the book's Definitions section):
+
+- **White-box monitoring:** monitoring based on numbers that the system reports about its
+  own insides. Sources: logs, interfaces that report what a running program is doing (for
+  example the Java Virtual Machine Profiling Interface), or an HTTP handler (a web address
+  on the server) that returns internal statistics.
+- **Black-box monitoring:** testing the behavior you can see from outside, the way a user
+  would see it.
+
+**How Google uses them:** heavy use of white-box monitoring, with modest but critical use
+of black-box monitoring.
+
+**Black-box shows symptoms.** A **symptom** is what is broken; a **cause** is why. Black-box
+monitoring shows problems that are happening now, not predicted ones: "the system is not
+working correctly, right now."
+
+**White-box looks inside.** It needs **instrumentation** (code that reports what the
+system is doing), such as logs or HTTP endpoints. Because it sees inside, it can catch:
+
+- problems that are about to happen
+- failures hidden by **retries** (the request failed, was tried again, and then worked, so
+  the user never saw the failure)
+
+**One person's symptom is another person's cause.** In a system built in layers, the same
+problem looks different from each layer. Example: a database is slow.
+
+- For the database SRE, slow database reads are a **symptom**.
+- For the frontend SRE watching a slow website, the same slow reads are a **cause**.
+
+So white-box monitoring can be about symptoms or about causes, depending on how much your
+white-box data tells you.
+
+**White-box is essential for debugging.** Example: web servers seem slow on requests that
+use the database a lot. You need two numbers:
+
+- how fast the web server thinks the database is
+- how fast the database thinks it is
+
+Without both, you cannot tell a slow database apart from a network problem between the web
+server and the database.
+
+**Black-box is useful for paging.** A page (an on-call alert) from black-box monitoring
+means the problem is already happening and already hurting users. That forces you to
+interrupt a human only for real problems. But for problems that have not happened yet and
+are about to, black-box monitoring is fairly useless.
+
 ## The Four Golden Signals
 
 The four golden signals are **latency**, **traffic**, **errors**, and **saturation**.
@@ -204,6 +252,11 @@ The questions above come from one basic view of pages (on-call alerts) and pager
 
 ## Key takeaways
 
+- White-box monitoring reads the system's insides (logs, internal stats). Black-box
+  monitoring tests from outside, as a user would. Google uses white-box heavily and
+  black-box for a few critical checks.
+- Black-box shows problems happening now (good for pages). White-box also catches problems
+  about to happen and failures hidden by retries, and is essential for debugging.
 - The four golden signals: latency, traffic, errors, saturation. Measure these first.
 - Track the latency of failed requests separately from successful ones. A slow error is
   worse than a fast one.
