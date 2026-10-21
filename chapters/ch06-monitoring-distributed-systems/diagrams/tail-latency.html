@@ -102,7 +102,7 @@
   <header>
     <div class="eyebrow">Chapter 6 · Worrying about your tail</div>
     <h1>One backend's 1% becomes the web page's median</h1>
-    <p class="sub">A web service averages 100 ms at 1,000 requests per second, but 1% of requests take 5 seconds. A web page that needs many such backends waits for the slowest one, so the slow 1% shows up on far more web pages.</p>
+    <p class="sub">A web service averages 100 ms at 1,000 requests per second, but 1% of requests take 5 seconds. To build one web page, a frontend server asks several backends for parts of the answer. A backend is a service like this one. The web page is ready only after every backend answers, so the slow 1% shows up on far more than 1% of web pages.</p>
   </header>
 
   <div class="layout">
@@ -215,7 +215,7 @@ const steps = [
   },
   {
     title: 'A web page needs many backends',
-    desc: 'Now a frontend (the server that builds the web page) calls backends like this one. It must wait for every answer, so one slow backend makes the whole web page slow. With 1 backend, 1 web page in 100 waits 5 s. That is the backend\'s 99th percentile (the time 99 of 100 requests finish in or less) showing up as the web page\'s 99th percentile.',
+    desc: 'Now a frontend (the server that builds the web page) sends a request to each of its backends. A backend is a service that answers one part of the web page, like the web service in steps 1 to 4. The frontend can show the web page only after every backend answers, so one slow answer makes the whole web page slow. With 1 backend, 1 web page in 100 waits 5 s. That is the backend\'s 99th percentile (the time 99 of 100 requests finish in or less) showing up as the web page\'s 99th percentile.',
     on: ['s2'], backends: 1
   },
   {
@@ -225,7 +225,7 @@ const steps = [
   },
   {
     title: '70 backends: the median web page takes 5 s',
-    desc: 'All 70 are fast only about 49% of the time. So about 51 web pages in 100 wait 5 s. The middle web page is now a slow one: the 99th percentile of one backend has become the median of the frontend. The book only says "several" backends and gives no count. 70 is the arithmetic for exactly 1% slow per backend: it crosses half at about 69.',
+    desc: 'All 70 are fast only about 49% of the time. So about 51 web pages in 100 wait 5 s. The middle web page is now a slow one: the 99th percentile of one backend has become the median response time of the frontend. The book only says "several" backends and gives no count. 70 comes from the arithmetic for exactly 1% slow requests per backend: at 69 backends, the share of slow web pages first goes above half.',
     on: ['s2'], backends: 70
   }
 ];

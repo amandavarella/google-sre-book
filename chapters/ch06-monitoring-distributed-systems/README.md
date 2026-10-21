@@ -85,11 +85,15 @@ decently covered by monitoring.
 - Footnote 23: if 1% of requests are 50 times the average, the other requests are about
   twice as fast as the average (here, about 50 ms). If you do not measure the distribution,
   believing most requests are near the average is just hope.
-- If a user's web page needs several such web services (backends) to render, the
-  **99th percentile** of one backend (the time 99 of 100 requests finish in or less) can
-  easily become the **median** (the middle value) response of the **frontend** (the server
-  that builds the web page). The frontend waits for every backend, so one slow backend
+- To build one web page, the **frontend** (the server that builds the web page) sends a
+  request to several **backends**. A backend is a service that answers one part of the
+  web page. The book's case: each backend is a web service like the one above (100 ms
+  average, 1% of requests at 5 seconds).
+- The frontend can show the web page only after every backend answers. So one slow answer
   makes the whole web page slow.
+- Because of this, the **99th percentile** of one backend (the time 99 of 100 requests
+  finish in or less) can easily become the **median** (the middle value) response time of
+  the frontend.
 
 Step through it in the <a href="https://amandavarella.github.io/google-sre-book/chapters/ch06-monitoring-distributed-systems/diagrams/tail-latency.html" target="_blank" rel="noopener noreferrer">Worrying about your tail diagram</a>.
 
@@ -102,12 +106,15 @@ resolutions.
 - **CPU load:** if each data point is the CPU load over one minute, you will not see
   spikes, even quite long ones, that cause high tail latency (the slow end of request
   times, from the [section above](#worrying-about-your-tail-or-instrumentation-and-performance)).
-  The one-minute number smooths them away.
-- **Checking for success:** a web service aims for **99.9% uptime per year**, which is
+  The one-minute average mixes a short spike with the normal seconds around it, so the
+  spike does not show.
+- **Checking for success:** a web service aims for **99.9% uptime per year** (uptime: the
+  time the service is working), which is
   about **9 hours of total downtime per year**. A **probe** (a test request that checks for
   an HTTP 200, the "OK" response) sent more than once or twice a minute is probably more
   often than needed.
-- **Hard drive fullness:** for a service aiming at 99.9% availability, checking more often
+- **Hard drive fullness:** for a service aiming at 99.9% availability (the share of time
+  the service works), checking more often
   than once every 1 to 2 minutes is probably unnecessary.
 
 **Fine resolution costs money.**
