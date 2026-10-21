@@ -110,7 +110,7 @@ resolutions.
 - **Hard drive fullness:** for a service aiming at 99.9% availability, checking more often
   than once every 1 to 2 minutes is probably unnecessary.
 
-### Fine resolution costs money
+**Fine resolution costs money.**
 
 - Measuring CPU load every second can give interesting data. But data that frequent can be
   very expensive to collect, store, and analyze.
