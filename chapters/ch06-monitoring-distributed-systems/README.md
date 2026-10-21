@@ -165,6 +165,31 @@ point stays the same.
   get data). The other system pulls summary data from it, in a format that can stay the
   same for a long time.
 
+## Questions to avoid false positives and pager burnout
+
+When you write a rule for monitoring and alerting, the book says these questions help you
+avoid **false positives** (an alert fires, but nothing is wrong for users) and **pager
+burnout** (on-call people worn out by too many alerts). A **page** is an on-call alert.
+
+1. **Does this rule catch something that would otherwise go unnoticed?** And is that
+   condition urgent, **actionable** (a person can do something about it), and visible to
+   users now or soon?
+   - Footnote 25: "soon" includes running with **zero redundancy** (N + 0: no spare, so
+     one more failure hits users) and parts of the service that are nearly full.
+2. **Will I ever ignore this alert because I know it is harmless?** When and why would I
+   ignore it, and how can I avoid that situation?
+3. **Does this alert definitely mean users are being hurt?** Some cases can be detected
+   where users are not affected, and those should be filtered out. Examples: **drained
+   traffic** (users were moved away from that part of the service on purpose) and test
+   deployments.
+4. **Can I act on this alert?**
+   - Is the action urgent, or could it wait until morning?
+   - Could the action be safely automated?
+   - Is it a long-term fix, or only a short-term **workaround** (a patch that hides the
+     problem for now)?
+5. **Are other people being paged for the same issue?** If so, at least one of the pages
+   is unnecessary.
+
 ## Key takeaways
 
 - The four golden signals: latency, traffic, errors, saturation. Measure these first.
@@ -185,6 +210,9 @@ point stays the same.
 - Keep monitoring separate from profiling, debugging, crash tracking, load testing, logs,
   and traffic inspection. Join the systems through simple, stable connection points, such
   as a web API for summary data.
+- Before adding an alert rule, ask: does it catch something unnoticed, urgent, actionable,
+  and visible to users? Would I ever ignore it? Are users definitely hurt? Can I act on
+  it now? Is someone else already paged for it?
 
 ## Interactive diagrams
 
