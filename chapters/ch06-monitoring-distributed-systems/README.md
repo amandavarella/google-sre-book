@@ -82,6 +82,10 @@ decently covered by monitoring.
 - Example from the book: a web service has an **average latency of 100 ms** at **1,000
   requests per second**. **1% of requests** (10 per second) can easily take **5 seconds**.
   The average hides them.
+  - The other **99%** (990 per second) are fast.
+  - The **99th percentile** is the line between the two groups: 99 of every 100 requests
+    finish fast, and the slowest 1 of every 100 takes 5 seconds. The 5-second requests sit
+    just past the 99th percentile.
 - Footnote 23: if 1% of requests are 50 times the average, the other requests are about
   twice as fast as the average (here, about 50 ms). If you do not measure the distribution,
   believing most requests are near the average is just hope.
