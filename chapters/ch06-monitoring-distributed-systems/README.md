@@ -141,6 +141,30 @@ This shows brief CPU hotspots (short spikes of high CPU use) without the very hi
 collecting and keeping every per-second reading. (A minute of readings becomes one set of
 counters that adds up to 60, instead of 60 separate values.)
 
+## Keeping it simple
+
+It can be tempting to put other ways of inspecting a complex system into the monitoring
+system too:
+
+- detailed system **profiling** (measuring where a program spends its time and memory)
+- **single-process debugging** (looking inside one running program to find a bug)
+- tracking details about exceptions or crashes
+- **load testing** (pushing traffic at a service until it struggles)
+- collecting and analyzing logs
+- **traffic inspection** (looking at the actual requests going over the network)
+
+Most of these have things in common with basic monitoring. But blending too many of them
+into one system makes it overly complex and **fragile** (it breaks easily).
+
+The book's better strategy, as in much of software engineering: keep them as separate
+systems, joined by clear, simple, **loosely coupled** connection points. Loosely coupled
+means one system can change inside without breaking the others, as long as the connection
+point stays the same.
+
+- Example: one system offers a **web API** (a fixed web address another program calls to
+  get data). The other system pulls summary data from it, in a format that can stay the
+  same for a long time.
+
 ## Key takeaways
 
 - The four golden signals: latency, traffic, errors, saturation. Measure these first.
@@ -158,6 +182,9 @@ counters that adds up to 60, instead of 60 separate values.)
   target, probing more than once or twice a minute is probably too often.
 - To see short spikes cheaply, sample every second on the server into 5% buckets and
   aggregate every minute.
+- Keep monitoring separate from profiling, debugging, crash tracking, load testing, logs,
+  and traffic inspection. Join the systems through simple, stable connection points, such
+  as a web API for summary data.
 
 ## Interactive diagrams
 
