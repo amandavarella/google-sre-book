@@ -93,6 +93,43 @@ decently covered by monitoring.
 
 Step through it in the <a href="https://amandavarella.github.io/google-sre-book/chapters/ch06-monitoring-distributed-systems/diagrams/tail-latency.html" target="_blank" rel="noopener noreferrer">Worrying about your tail diagram</a>.
 
+## Choosing an Appropriate Resolution for Measurements
+
+**Resolution** (also called **granularity**) is how often you take a measurement, or how
+long a window each data point covers. Different parts of a system need different
+resolutions.
+
+- **CPU load:** if each data point is the CPU load over one minute, you will not see
+  spikes, even quite long ones, that cause high tail latency (the slow end of request
+  times, from the [section above](#worrying-about-your-tail-or-instrumentation-and-performance)).
+  The one-minute number smooths them away.
+- **Checking for success:** a web service aims for **99.9% uptime per year**, which is
+  about **9 hours of total downtime per year**. A **probe** (a test request that checks for
+  an HTTP 200, the "OK" response) sent more than once or twice a minute is probably more
+  often than needed.
+- **Hard drive fullness:** for a service aiming at 99.9% availability, checking more often
+  than once every 1 to 2 minutes is probably unnecessary.
+
+### Fine resolution costs money
+
+- Measuring CPU load every second can give interesting data. But data that frequent can be
+  very expensive to collect, store, and analyze.
+- When you need high resolution but do not need the result with very little delay, the
+  book says you can cut the cost: the server **samples** (measures) itself often, and an
+  outside monitoring system collects and **aggregates** (combines) the results over time
+  or across servers.
+
+The book's example:
+
+1. Record the current CPU use every second.
+2. Keep one counter per **bucket**, a range of 5% (0 to 5%, 5 to 10%, and so on up to
+   100%). Every second, add 1 to the counter for the range that second's reading fell in.
+3. Every minute, send the counters on and combine them.
+
+This shows brief CPU hotspots (short spikes of high CPU use) without the very high cost of
+collecting and keeping every per-second reading. (A minute of readings becomes one set of
+counters that adds up to 60, instead of 60 separate values.)
+
 ## Key takeaways
 
 - The four golden signals: latency, traffic, errors, saturation. Measure these first.
@@ -103,6 +140,12 @@ Step through it in the <a href="https://amandavarella.github.io/google-sre-book/
 - Saturation means the most limited resource; rising 99th percentile latency is an early
   warning.
 - Page a human when a signal is a problem (saturation: nearly a problem).
+- An average can hide a slow tail: 100 ms average with 1% of requests at 5 s. Across several
+  backends, one backend's 99th percentile can become the web page's median.
+- Pick a resolution for each measurement. One-minute CPU averages hide spikes. For a 99.9%
+  target, probing more than once or twice a minute is probably too often.
+- To see short spikes cheaply, sample every second on the server into 5% buckets and
+  aggregate every minute.
 
 ## Interactive diagrams
 
