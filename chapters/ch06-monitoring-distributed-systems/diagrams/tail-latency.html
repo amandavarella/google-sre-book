@@ -109,7 +109,7 @@
     <div class="stage">
       <svg viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tl-title tl-desc">
         <title id="tl-title">One backend's 1% becomes the web page's median</title>
-        <desc id="tl-desc">First, 1,000 requests in one second: 990 fast and 10 that take 5 seconds, with an average of 100 ms. Then a frontend that calls 1, 10, or 70 backends: the share of web pages that wait 5 seconds grows from 1 in 100 to about 51 in 100.</desc>
+        <desc id="tl-desc">First, 1,000 requests in one second: 990 fast and 10 that take 5 seconds, with an average of 100 ms. Then a frontend that asks 1, 10, or 70 backends: the share of web pages that wait 5 seconds grows from 1 in 100 to about 51 in 100.</desc>
 
         <!-- Scene 1: one backend, one second of traffic -->
         <g id="s1-grid" class="layer">
@@ -153,8 +153,8 @@
           <path d="M240 225 L300 225" stroke="#5EEAD4" stroke-width="1.8"/>
           <path d="M292 219 L302 225 L292 231" fill="none" stroke="#5EEAD4" stroke-width="1.8"/>
 
-          <text x="310" y="44" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" id="beLabel">BACKENDS CALLED: 1</text>
-          <text x="310" y="66" fill="#8FA1BC" font-size="13" font-family="'Inter', sans-serif">each: 99 of 100 answers fast, 1 takes 5 s</text>
+          <text x="310" y="44" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" id="beLabel">BACKENDS THE FRONTEND ASKS: 1</text>
+          <text x="310" y="66" fill="#8FA1BC" font-size="13" font-family="'Inter', sans-serif">each backend: 99 of 100 answers fast, 1 takes 5 s</text>
           <g id="beGrid"></g>
 
           <text x="760" y="44" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace">100 WEB PAGE LOADS</text>
@@ -214,8 +214,8 @@ const steps = [
     on: ['s1-grid','s1-avg','s1-slow','s1-time','s1-split'], slowReqs: true
   },
   {
-    title: 'A web page needs many backends',
-    desc: 'Now a frontend (the server that builds the web page) sends a request to each of its backends. A backend is a service that answers one part of the web page, like the web service in steps 1 to 4. The frontend can show the web page only after every backend answers, so one slow answer makes the whole web page slow. With 1 backend, 1 web page in 100 waits 5 s. That is the backend\'s 99th percentile (the time 99 of 100 requests finish in or less) showing up as the web page\'s 99th percentile.',
+    title: '1 backend: 1 of 100 web pages is slow',
+    desc: 'A frontend is the server that builds the web page. It does not make every part of the web page itself. It sends a request to other services, called backends, and each backend sends back one part. Each backend here is a web service like the one in steps 1 to 4. The frontend can show the web page only after every backend answers, so one slow answer makes the whole web page slow. With 1 backend, 1 web page in 100 waits 5 s. That is the backend\'s 99th percentile (the time 99 of 100 requests finish in or less) showing up as the web page\'s 99th percentile.',
     on: ['s2'], backends: 1
   },
   {
@@ -310,7 +310,7 @@ function render(){
     const slowPages = Math.round(pSlow * 100);
     pageCells.forEach(c => c.setAttribute('fill', CYAN));
     pageOrder.slice(0, slowPages).forEach(i => pageCells[i].setAttribute('fill', AMBER));
-    document.getElementById('beLabel').textContent = 'BACKENDS CALLED: ' + n;
+    document.getElementById('beLabel').textContent = 'BACKENDS THE FRONTEND ASKS: ' + n;
     document.getElementById('probLine').textContent =
       'Chance a web page waits 5 s = 1 − ' + (n > 1 ? '(0.99 multiplied by itself ' + n + ' times)' : '0.99') +
       ' ≈ ' + (pSlow * 100).toFixed(pSlow < 0.1 ? 1 : 0) + '%  →  about ' + slowPages + ' of 100 web pages';

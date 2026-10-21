@@ -147,8 +147,9 @@ counters that adds up to 60, instead of 60 separate values.)
 - Saturation means the most limited resource; rising 99th percentile latency is an early
   warning.
 - Page a human when a signal is a problem (saturation: nearly a problem).
-- An average can hide a slow tail: 100 ms average with 1% of requests at 5 s. Across several
-  backends, one backend's 99th percentile can become the web page's median.
+- An average can hide a slow tail: 100 ms average with 1% of requests at 5 s. When a web
+  page needs an answer from several backends, one backend's 99th percentile can become the
+  web page's median.
 - Pick a resolution for each measurement. One-minute CPU averages hide spikes. For a 99.9%
   target, probing more than once or twice a minute is probably too often.
 - To see short spikes cheaply, sample every second on the server into 5% buckets and
