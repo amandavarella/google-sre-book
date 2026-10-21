@@ -190,6 +190,18 @@ burnout** (on-call people worn out by too many alerts). A **page** is an on-call
 5. **Are other people being paged for the same issue?** If so, at least one of the pages
    is unnecessary.
 
+## Philosophy on pages and pagers
+
+The questions above come from one basic view of pages (on-call alerts) and pagers:
+
+- **Every page needs a sense of urgency.** When the pager goes off, I should be able to
+  react urgently. A person can do that only a few times a day before **fatigue** (being
+  too tired to react well) sets in.
+- **Every page should be actionable.** The person paged can do something about it.
+- **Every page response should need intelligence.** If a page only needs a **robotic
+  response** (the same fixed steps every time, with no thinking), it should not be a page.
+- **Pages should be about a novel problem**: a problem or event not seen before.
+
 ## Key takeaways
 
 - The four golden signals: latency, traffic, errors, saturation. Measure these first.
@@ -213,6 +225,7 @@ burnout** (on-call people worn out by too many alerts). A **page** is an on-call
 - Before adding an alert rule, ask: does it catch something unnoticed, urgent, actionable,
   and visible to users? Would I ever ignore it? Are users definitely hurt? Can I act on
   it now? Is someone else already paged for it?
+- Every page should be urgent, actionable, need human thinking, and be about a new problem.
 
 ## Interactive diagrams
 
