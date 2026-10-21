@@ -75,6 +75,24 @@ Measure all four signals. **Page** a human (send an on-call alert) when one of t
 problem, or, for saturation, nearly a problem. Then the book says your service is at least
 decently covered by monitoring.
 
+## Worrying About Your Tail (or, Instrumentation and Performance)
+
+- A **tail** is the slow end of the latency distribution: the few requests that take far
+  longer than most.
+- Example from the book: a web service has an **average latency of 100 ms** at **1,000
+  requests per second**. **1% of requests** (10 per second) can easily take **5 seconds**.
+  The average hides them.
+- Footnote 23: if 1% of requests are 50 times the average, the other requests are about
+  twice as fast as the average (here, about 50 ms). If you do not measure the distribution,
+  believing most requests are near the average is just hope.
+- If a user's web page needs several such web services (backends) to render, the
+  **99th percentile** of one backend (the time 99 of 100 requests finish in or less) can
+  easily become the **median** (the middle value) response of the **frontend** (the server
+  that builds the web page). The frontend waits for every backend, so one slow backend
+  makes the whole web page slow.
+
+Step through it in the <a href="https://amandavarella.github.io/google-sre-book/chapters/ch06-monitoring-distributed-systems/diagrams/tail-latency.html" target="_blank" rel="noopener noreferrer">Worrying about your tail diagram</a>.
+
 ## Key takeaways
 
 - The four golden signals: latency, traffic, errors, saturation. Measure these first.
@@ -88,7 +106,11 @@ decently covered by monitoring.
 
 ## Interactive diagrams
 
-_None yet._
+| Diagram | Open |
+| --- | --- |
+| **Worrying about your tail**: average 100 ms, 10 of 1,000 requests take 5 s; with 1, 10, then 70 backends, the slow share of web pages grows until the median web page takes 5 s | <a href="https://amandavarella.github.io/google-sre-book/chapters/ch06-monitoring-distributed-systems/diagrams/tail-latency.html" target="_blank" rel="noopener noreferrer">Open</a> |
+
+Open the HTML in a browser. GitHub markdown will not run the clicks.
 
 ## Questions / things to revisit
 

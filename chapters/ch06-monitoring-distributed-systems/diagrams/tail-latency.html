@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Worrying about your tail</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0B1220;
+    --grid:rgba(255,255,255,0.045);
+    --panel:#111C2E;
+    --panel-border:#26374F;
+    --text:#E7EDF6;
+    --text-dim:#8FA1BC;
+    --req:#5EEAD4;
+    --res:#FBBF24;
+    --gslb:#F472B6;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      linear-gradient(var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px) 0 0/40px 40px,
+      var(--bg);
+    color:var(--text);
+    font-family:'Inter', sans-serif;
+    min-height:100vh;
+    padding:28px 20px 60px;
+  }
+  .wrap{max-width:1440px; margin:0 auto;}
+  header{margin-bottom:22px;}
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:12px; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--req); margin-bottom:8px;
+  }
+  h1{
+    font-family:'JetBrains Mono', monospace;
+    font-weight:700; font-size:clamp(24px,4vw,34px);
+    letter-spacing:-0.01em;
+  }
+  .sub{color:var(--text-dim); font-size:14px; margin-top:8px; max-width:720px; line-height:1.5;}
+
+  .layout{display:grid; grid-template-columns:1fr; gap:18px; margin-top:24px; align-items:start;}
+  @media(min-width:1100px){ .layout{grid-template-columns: 2.4fr 1fr;} }
+
+  .stage{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
+    padding:14px; overflow:hidden;
+  }
+  svg{width:100%; height:auto; display:block;}
+
+  .layer{
+    opacity:0; pointer-events:none; transition:opacity 0.35s ease;
+  }
+  .layer.on{opacity:1; pointer-events:auto;}
+
+  .side{display:flex; flex-direction:column; gap:14px;}
+  .card{
+    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; padding:16px;
+  }
+  .step-tag{
+    font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--req);
+    letter-spacing:0.08em; text-transform:uppercase; margin-bottom:6px;
+  }
+  .step-title{font-size:18px; font-weight:700; margin-bottom:8px; line-height:1.3;}
+  .step-desc{font-size:14px; color:var(--text-dim); line-height:1.55;}
+
+  .controls{display:flex; gap:8px; margin-top:16px;}
+  button{
+    font-family:'JetBrains Mono',monospace; font-size:12px; letter-spacing:0.04em;
+    background:#16283F; color:var(--text); border:1px solid var(--panel-border);
+    border-radius:6px; padding:9px 14px; cursor:pointer; transition:all 0.15s;
+  }
+  button:hover:not(:disabled){border-color:var(--req); color:var(--req);}
+  button:disabled{opacity:0.35; cursor:not-allowed;}
+  button.primary{background:var(--req); color:#08131f; border-color:var(--req); font-weight:700;}
+  button.primary:hover{filter:brightness(1.08);}
+
+  .progress{display:flex; gap:5px; margin-top:14px; flex-wrap:wrap;}
+  .progress span{
+    width:100%; max-width:16px; height:5px; border-radius:3px; background:#233149; cursor:pointer;
+  }
+  .progress span.done{background:var(--req);}
+  .progress span.now{outline:2px solid #fff; outline-offset:1px;}
+
+  .legend{
+    display:flex; gap:16px; flex-wrap:wrap; font-size:11px; color:var(--text-dim);
+    margin-top:12px; font-family:'JetBrains Mono',monospace;
+  }
+  .legend span{display:flex; align-items:center; gap:6px;}
+  .swatch{width:16px; height:3px; border-radius:2px; display:inline-block;}
+
+  footer{margin-top:22px; font-size:12px; color:var(--text-dim); text-align:center;}
+  footer a{color:var(--req);}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div class="eyebrow">Chapter 6 · Worrying about your tail</div>
+    <h1>One backend's 1% becomes the web page's median</h1>
+    <p class="sub">A web service averages 100 ms at 1,000 requests per second, but 1% of requests take 5 seconds. A web page that needs many such backends waits for the slowest one, so the slow 1% shows up on far more web pages.</p>
+  </header>
+
+  <div class="layout">
+    <div class="stage">
+      <svg viewBox="0 0 1100 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="tl-title tl-desc">
+        <title id="tl-title">One backend's 1% becomes the web page's median</title>
+        <desc id="tl-desc">First, 1,000 requests in one second: 990 fast and 10 that take 5 seconds, with an average of 100 ms. Then a frontend that calls 1, 10, or 70 backends: the share of web pages that wait 5 seconds grows from 1 in 100 to about 51 in 100.</desc>
+
+        <!-- Scene 1: one backend, one second of traffic -->
+        <g id="s1-grid" class="layer">
+          <text x="60" y="44" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace">ONE SECOND · 1,000 REQUESTS TO ONE WEB SERVICE</text>
+          <g id="reqGrid"></g>
+          <text x="890" y="80" fill="#5EEAD4" font-size="14" font-family="'Inter', sans-serif">■ fast request</text>
+          <text x="890" y="104" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif" id="slowKey">■ 5 s request</text>
+        </g>
+
+        <g id="s1-avg" class="layer">
+          <rect x="880" y="150" width="190" height="80" rx="8" fill="#1A1420" stroke="#F472B6" stroke-width="1.6" stroke-dasharray="6 5"/>
+          <text x="975" y="180" fill="#F472B6" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">AVERAGE</text>
+          <text x="975" y="210" fill="#E7EDF6" font-size="22" font-weight="700" font-family="'JetBrains Mono', monospace" text-anchor="middle">100 ms</text>
+        </g>
+
+        <g id="s1-slow" class="layer">
+          <text x="975" y="268" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">1% of 1,000 = 10</text>
+          <text x="975" y="290" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">requests take 5 s</text>
+        </g>
+
+        <g id="s1-time" class="layer">
+          <text x="60" y="384" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace">TOTAL WAITING TIME · 1,000 × 100 ms = 100,000 ms</text>
+          <rect x="60" y="396" width="490" height="36" rx="4" fill="#5EEAD4"/>
+          <rect x="550" y="396" width="490" height="36" rx="4" fill="#FBBF24"/>
+          <text x="305" y="420" fill="#08131f" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">990 fast requests · 50,000 ms</text>
+          <text x="795" y="420" fill="#08131f" font-size="14" font-family="'JetBrains Mono', monospace" text-anchor="middle">10 × 5,000 ms = 50,000 ms</text>
+          <text x="795" y="456" fill="#FBBF24" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">10 slow requests use half of all the time</text>
+        </g>
+
+        <g id="s1-split" class="layer">
+          <text x="305" y="456" fill="#5EEAD4" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">50,000 ms ÷ 990 ≈ 50 ms each</text>
+          <text x="550" y="496" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif" text-anchor="middle">Almost no request takes 100 ms. Most take about 50 ms. A few take 5,000 ms.</text>
+        </g>
+
+        <!-- Scene 2: a frontend that calls many backends -->
+        <g id="s2" class="layer">
+          <rect x="40" y="170" width="200" height="110" rx="8" fill="#16283F" stroke="#5EEAD4" stroke-width="1.4"/>
+          <text x="140" y="204" fill="#5EEAD4" font-size="13" font-family="'JetBrains Mono', monospace" text-anchor="middle">FRONTEND</text>
+          <text x="140" y="230" fill="#E7EDF6" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">builds the web page</text>
+          <text x="140" y="252" fill="#8FA1BC" font-size="14" font-family="'Inter', sans-serif" text-anchor="middle">waits for every backend</text>
+          <path d="M240 225 L300 225" stroke="#5EEAD4" stroke-width="1.8"/>
+          <path d="M292 219 L302 225 L292 231" fill="none" stroke="#5EEAD4" stroke-width="1.8"/>
+
+          <text x="310" y="44" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace" id="beLabel">BACKENDS CALLED: 1</text>
+          <text x="310" y="66" fill="#8FA1BC" font-size="13" font-family="'Inter', sans-serif">each: 99 of 100 answers fast, 1 takes 5 s</text>
+          <g id="beGrid"></g>
+
+          <text x="760" y="44" fill="#8FA1BC" font-size="13" font-family="'JetBrains Mono', monospace">100 WEB PAGE LOADS</text>
+          <text x="760" y="66" fill="#8FA1BC" font-size="13" font-family="'Inter', sans-serif">amber: at least one backend was slow</text>
+          <g id="pageGrid"></g>
+
+          <rect x="40" y="410" width="1020" height="92" rx="8" fill="#0F1A2B" stroke="#26374F" stroke-width="1.4"/>
+          <text x="70" y="444" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif" id="probLine">Chance a web page waits 5 s</text>
+          <text x="70" y="478" fill="#E7EDF6" font-size="15" font-family="'Inter', sans-serif" id="medianLine">Median web page</text>
+        </g>
+      </svg>
+      <div class="legend">
+        <span><i class="swatch" style="background:var(--req)"></i>fast</span>
+        <span><i class="swatch" style="background:var(--res)"></i>takes 5 s (the tail)</span>
+        <span><i class="swatch" style="background:var(--gslb); height:0; border-top:2px dashed var(--gslb); width:18px;"></i>the average, which hides the tail</span>
+      </div>
+    </div>
+
+    <div class="side">
+      <div class="card">
+        <div class="step-tag" id="stepTag">Step 1 of 7</div>
+        <div class="step-title" id="stepTitle"></div>
+        <div class="step-desc" id="stepDesc"></div>
+        <div class="controls">
+          <button id="prevBtn">◀ Back</button>
+          <button id="nextBtn" class="primary">Next ▶</button>
+          <button id="playBtn">▶ Play</button>
+        </div>
+        <div class="progress" id="progress"></div>
+      </div>
+    </div>
+  </div>
+
+  <footer>Chapter 6 · Monitoring Distributed Systems · <a href="https://sre.google/sre-book/monitoring-distributed-systems/" target="_blank" rel="noopener noreferrer">book chapter</a></footer>
+</div>
+
+<script>
+const steps = [
+  {
+    title: '1,000 requests, average 100 ms',
+    desc: 'One web service gets 1,000 requests per second. The average latency (the time to answer a request) is 100 ms. From the average alone, every request looks like it takes about 100 ms.',
+    on: ['s1-grid','s1-avg'], slowReqs: false
+  },
+  {
+    title: '1% of them take 5 seconds',
+    desc: '1% of 1,000 is 10 requests. Each of those 10 takes 5 seconds (5,000 ms). The book says this can easily happen behind an average of 100 ms. These slow requests are the tail: the slow end of the distribution.',
+    on: ['s1-grid','s1-avg','s1-slow'], slowReqs: true
+  },
+  {
+    title: 'The 10 slow requests use half the time',
+    desc: 'An average of 100 ms over 1,000 requests is 100,000 ms of waiting in total. The 10 slow requests take 10 × 5,000 = 50,000 ms. That is half of the total, from 1% of the requests.',
+    on: ['s1-grid','s1-avg','s1-slow','s1-time'], slowReqs: true
+  },
+  {
+    title: 'The other 990 are twice as fast as the average',
+    desc: 'The other 990 requests share the other 50,000 ms, so each takes about 50 ms. Footnote 23 in the book makes this point: if 1% of requests are 50 times the average, the rest are about twice as fast as the average. If you do not measure the distribution, believing most requests are near the average is just hope.',
+    on: ['s1-grid','s1-avg','s1-slow','s1-time','s1-split'], slowReqs: true
+  },
+  {
+    title: 'A web page needs many backends',
+    desc: 'Now a frontend (the server that builds the web page) calls backends like this one. It must wait for every answer, so one slow backend makes the whole web page slow. With 1 backend, 1 web page in 100 waits 5 s. That is the backend\'s 99th percentile (the time 99 of 100 requests finish in or less) showing up as the web page\'s 99th percentile.',
+    on: ['s2'], backends: 1
+  },
+  {
+    title: '10 backends: about 10 of 100 web pages are slow',
+    desc: 'Each backend is fast 99 times in 100. All 10 are fast only 0.99 multiplied by itself 10 times = about 90% of the time. So about 10 web pages in 100 wait 5 s. The median web page (the middle one when you sort all 100 by time) is still fast.',
+    on: ['s2'], backends: 10
+  },
+  {
+    title: '70 backends: the median web page takes 5 s',
+    desc: 'All 70 are fast only about 49% of the time. So about 51 web pages in 100 wait 5 s. The middle web page is now a slow one: the 99th percentile of one backend has become the median of the frontend. The book only says "several" backends and gives no count. 70 is the arithmetic for exactly 1% slow per backend: it crosses half at about 69.',
+    on: ['s2'], backends: 70
+  }
+];
+
+const NS = 'http://www.w3.org/2000/svg';
+function rect(parent, x, y, w, h, fill){
+  const r = document.createElementNS(NS, 'rect');
+  r.setAttribute('x', x); r.setAttribute('y', y);
+  r.setAttribute('width', w); r.setAttribute('height', h);
+  r.setAttribute('rx', 2); r.setAttribute('fill', fill);
+  parent.appendChild(r);
+  return r;
+}
+
+// Fixed, scattered order so the same cells turn amber every time.
+function scatter(n, seed){
+  const order = [...Array(n).keys()];
+  let s = seed;
+  for(let i = n - 1; i > 0; i--){
+    s = (s * 9301 + 49297) % 233280;
+    const j = Math.floor(s / 233280 * (i + 1));
+    [order[i], order[j]] = [order[j], order[i]];
+  }
+  return order;
+}
+
+const CYAN = '#5EEAD4', AMBER = '#FBBF24', OFF = '#233149';
+
+// 1,000 requests: 50 columns × 20 rows
+const reqCells = [];
+const reqGrid = document.getElementById('reqGrid');
+for(let i = 0; i < 1000; i++){
+  reqCells.push(rect(reqGrid, 60 + (i % 50) * 16, 64 + Math.floor(i / 50) * 14, 12, 10, CYAN));
+}
+const slowReqIdx = scatter(1000, 7).slice(0, 10);
+
+// up to 70 backends: 10 columns × 7 rows
+const beCells = [];
+const beGrid = document.getElementById('beGrid');
+for(let i = 0; i < 70; i++){
+  beCells.push(rect(beGrid, 310 + (i % 10) * 40, 96 + Math.floor(i / 10) * 40, 32, 32, OFF));
+}
+
+// 100 web page loads: 10 × 10
+const pageCells = [];
+const pageGrid = document.getElementById('pageGrid');
+for(let i = 0; i < 100; i++){
+  pageCells.push(rect(pageGrid, 760 + (i % 10) * 30, 96 + Math.floor(i / 10) * 30, 24, 24, CYAN));
+}
+const pageOrder = scatter(100, 3);
+
+let current = 0;
+let playing = false;
+let playTimer = null;
+
+const ids = ['s1-grid','s1-avg','s1-slow','s1-time','s1-split','s2'];
+const els = {};
+ids.forEach(id => { els[id] = document.getElementById(id); });
+
+const progressEl = document.getElementById('progress');
+steps.forEach((s,i)=>{
+  const d = document.createElement('span');
+  d.addEventListener('click', ()=> goTo(i));
+  progressEl.appendChild(d);
+});
+
+function render(){
+  const s = steps[current];
+  ids.forEach(id => {
+    els[id].classList.remove('on');
+    if(s.on.includes(id)) els[id].classList.add('on');
+  });
+
+  reqCells.forEach(c => c.setAttribute('fill', CYAN));
+  if(s.slowReqs) slowReqIdx.forEach(i => reqCells[i].setAttribute('fill', AMBER));
+  document.getElementById('slowKey').style.opacity = s.slowReqs ? 1 : 0;
+
+  if(s.backends){
+    const n = s.backends;
+    beCells.forEach((c, i) => c.setAttribute('fill', i < n ? CYAN : OFF));
+    const pSlow = 1 - Math.pow(0.99, n);
+    const slowPages = Math.round(pSlow * 100);
+    pageCells.forEach(c => c.setAttribute('fill', CYAN));
+    pageOrder.slice(0, slowPages).forEach(i => pageCells[i].setAttribute('fill', AMBER));
+    document.getElementById('beLabel').textContent = 'BACKENDS CALLED: ' + n;
+    document.getElementById('probLine').textContent =
+      'Chance a web page waits 5 s = 1 − ' + (n > 1 ? '(0.99 multiplied by itself ' + n + ' times)' : '0.99') +
+      ' ≈ ' + (pSlow * 100).toFixed(pSlow < 0.1 ? 1 : 0) + '%  →  about ' + slowPages + ' of 100 web pages';
+    const medianSlow = slowPages > 50;
+    const med = document.getElementById('medianLine');
+    med.textContent = medianSlow
+      ? 'Median web page: 5 s. More than half the web pages are slow, so the middle one is slow.'
+      : 'Median web page: fast. Fewer than half the web pages are slow.';
+    med.setAttribute('fill', medianSlow ? AMBER : CYAN);
+  }
+
+  document.getElementById('stepTag').textContent = 'Step ' + (current+1) + ' of ' + steps.length;
+  document.getElementById('stepTitle').textContent = s.title;
+  document.getElementById('stepDesc').textContent = s.desc;
+
+  [...progressEl.children].forEach((d,i)=>{
+    d.classList.toggle('now', i===current);
+    d.classList.toggle('done', i<=current);
+  });
+
+  document.getElementById('prevBtn').disabled = current===0;
+  document.getElementById('nextBtn').disabled = current===steps.length-1;
+}
+
+function goTo(i){
+  current = Math.max(0, Math.min(steps.length-1, i));
+  render();
+}
+
+document.getElementById('nextBtn').addEventListener('click', ()=> goTo(current+1));
+document.getElementById('prevBtn').addEventListener('click', ()=> goTo(current-1));
+
+const playBtn = document.getElementById('playBtn');
+playBtn.addEventListener('click', ()=>{
+  if(playing){
+    playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+    return;
+  }
+  playing=true; playBtn.textContent='⏸ Pause';
+  playTimer = setInterval(()=>{
+    if(current>=steps.length-1){
+      playing=false; clearInterval(playTimer); playBtn.textContent='▶ Play';
+      return;
+    }
+    goTo(current+1);
+  }, 3200);
+});
+
+render();
+</script>
+</body>
+</html>
