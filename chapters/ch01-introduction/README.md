@@ -110,6 +110,44 @@ From the 2nd edition (Figure 1-2). A pyramid of six layers, listed here top to b
 | 2. Situational awareness | Monitoring, observability, alerting, toil tracking, goal setting |
 | 1. Sociotechnical foundations | A safe and empowering culture of continuous improvement |
 
+### The Trend Toward Intent-Based Coordination Systems
+
+From the 2nd edition. This is about the next few years after the book was published: early
+moves, not settled practice.
+
+**The shift.** Today the platform is a collection of "vending machine" services: the engineer
+picks each implementation detail (a scaling policy, a database type). The industry is starting
+to try **intent-based** patterns instead: the engineer declares the desired state, and the
+platform works out how to get there.
+
+- **What the engineer declares:** broad goals, for example a latency target for one region, or
+  a strict budget limit.
+- **What the platform does:** it reconciles those goals with the infrastructure it has
+  (reconcile: keeps adjusting until the real state matches the declared goals). Its tools
+  include tier selection, resource isolation, workload migration, and performance throttling.
+
+Three emerging areas are shaping this shift:
+
+- **Adaptive signal filtering.** Modern telemetry (the metrics, logs, and traces a system
+  emits) produces too much noise. The move is away from static dashboards toward tools that
+  rank information by the current situation, such as context-aware debuggers and analysis
+  tools. The goal: show a human only the signals needed for the decision in front of them, so
+  diagnosis is faster.
+- **Embedded regulatory logic.** Compliance rules and data residency rules (where data is
+  allowed to be stored) are expected to be built into the deployment workflow. Legal and
+  geographic limits become part of the system's declared intent, not an afterthought.
+- **Resource and sustainability constraints.** Carbon intensity, energy cost, and energy
+  availability are treated as primary engineering constraints. Platforms might help move
+  workloads based on where energy is available or where regional power costs change.
+
+**What this may mean for the SRE role.** The SRE job may move from building golden paths to
+defining the constraints and objective functions (the goals the platform optimizes for) that
+guide the platform's decisions. The book calls this high-level policy governance.
+
+- Success is then measured less by the uptime of individual components.
+- It is measured more by whether the platform keeps a stable balance between performance, cost,
+  and compliance while conditions around the world keep changing.
+
 ## Key takeaways
 
 - SRE responsibilities interlock: emergency response, error budgets, efficiency, capacity
@@ -126,6 +164,9 @@ From the 2nd edition (Figure 1-2). A pyramid of six layers, listed here top to b
   (response speed under load) is part of capacity.
 - Capacity planning must cover both organic and inorganic growth, forecast beyond the
   capacity-acquisition lead time, and be validated with regular load testing.
+- (2nd edition) Platforms are starting to move toward intent-based coordination: engineers
+  declare goals (latency, budget, compliance, energy), and the platform reconciles them. The SRE
+  role may shift toward setting those constraints and goals (policy governance).
 
 <!-- obsidian:end -->
 
