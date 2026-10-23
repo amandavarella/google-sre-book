@@ -166,6 +166,64 @@ changes.
 **What successful organizations do.** They accept this shift and change how they think about
 three things: their observability tools, their processes, and their culture.
 
+### Organizations Rethinking Reliability
+
+From the 2nd edition.
+
+**The old view: reliability = infrastructure.** For decades, the traditional enterprise said a
+system was reliable if the servers were up, the network was clear, and the databases
+answered.
+
+- Teams built heavy redundancy into the hardware.
+- They chased "five nines" (99.999% availability) for each component.
+- Success meant the uptime of individual machines.
+
+**The new view: reliability = user experience.** The book calls the infrastructure-only view
+obsolete at best and harmful at worst. Enterprises are moving fast toward measuring the quality
+of what users actually experience.
+
+- Why: modern distributed systems are complex, often because of internet scale, not only
+  because of design choices.
+- This is now the norm, not the exception. Over the past decade, organizations have made the
+  change.
+
+#### The old metrics: RTO and RPO
+
+The shift means organizations must rethink which metrics define reliability. Enterprise
+reliability talk was dominated by two metrics from business continuity and disaster recovery
+(BC/DR):
+
+- **Recovery Time Objective (RTO):** how fast the system must be restored after a failure.
+- **Recovery Point Objective (RPO):** how much data loss is acceptable in a failure.
+
+They still matter for disasters (if a whole datacenter burns down, you need to know your RPO).
+They are weak as the main measure of day-to-day reliability, for three reasons:
+
+1. **They assume a failure is binary.** The system is "up" or "down", and "down" is a disaster
+   to recover from. Modern distributed systems rarely fail like that. They have **gray
+   failures**: partial problems such as a temporary slowdown, latency spikes on the slowest
+   requests, or a **brownout** (only some features stop working). RTO cannot describe a system
+   that is 30% slower for 10% of users.
+2. **They are reactive.** RTO is a stopwatch that starts only after the disaster. It measures how
+   good the organization is at firefighting. Modern SRE wants to "move left" (act earlier):
+   use the <a href="#error-budget">error budget</a> to manage risk before it turns into an
+   incident that needs recovery.
+3. **They are not tied to what users expect.** RTO and RPO are business-wide totals. They say
+   little about whether users' stated and unstated expectations are met. They are often set by
+   history and office politics, not by product, engineering, and operations working together.
+
+#### What the shift costs and what it pays
+
+- **The cost:** SREs must understand the business deeply, work closely with product owners to
+  find what matters to users, and build more detailed instrumentation (code that measures the
+  system).
+- **The payoff:** when reliability metrics follow user experience, SRE teams defend the business
+  value the systems deliver, not only the infrastructure.
+- **Where it is going:** the trend is speeding up. Measuring and reporting SLOs (service level
+  objectives, see
+  <a href="https://github.com/amandavarella/google-sre-book/blob/main/chapters/ch04-service-level-objectives/README.md#objectives" target="_blank" rel="noopener noreferrer">Chapter 4: Objectives</a>)
+  is now a basic expectation of a modern production platform.
+
 ## Key takeaways
 
 - SRE responsibilities interlock: emergency response, error budgets, efficiency, capacity
@@ -187,6 +245,9 @@ three things: their observability tools, their processes, and their culture.
   role may shift toward setting those constraints and goals (policy governance).
 - (2nd edition) When the cloud provider owns the infrastructure, observability shifts from the
   health of each component to the interactions between services.
+- (2nd edition) Reliability is moving from infrastructure uptime to user experience. RTO and RPO
+  still matter for disasters, but they assume up-or-down failure, start only after the fact, and
+  ignore user expectations. SLO reporting is now a basic platform expectation.
 
 <!-- obsidian:end -->
 
