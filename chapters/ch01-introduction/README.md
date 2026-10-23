@@ -148,6 +148,24 @@ guide the platform's decisions. The book calls this high-level policy governance
 - It is measured more by whether the platform keeps a stable balance between performance, cost,
   and compliance while conditions around the world keep changing.
 
+### From Components to Context
+
+From the 2nd edition.
+
+**The cause.** Companies hand their infrastructure to public cloud providers. The basic
+building blocks (primitives: servers, disks, networks) now belong to the provider, not the
+company.
+
+**The effect on observability** (observability: being able to see what a system is doing from
+the outside). The diagnostic surface area (the places you can look when something breaks)
+changes.
+
+- Before: the focus was the internal health of each component.
+- Now: the focus is the interactions you can observe between distributed services.
+
+**What successful organizations do.** They accept this shift and change how they think about
+three things: their observability tools, their processes, and their culture.
+
 ## Key takeaways
 
 - SRE responsibilities interlock: emergency response, error budgets, efficiency, capacity
@@ -167,6 +185,8 @@ guide the platform's decisions. The book calls this high-level policy governance
 - (2nd edition) Platforms are starting to move toward intent-based coordination: engineers
   declare goals (latency, budget, compliance, energy), and the platform reconciles them. The SRE
   role may shift toward setting those constraints and goals (policy governance).
+- (2nd edition) When the cloud provider owns the infrastructure, observability shifts from the
+  health of each component to the interactions between services.
 
 <!-- obsidian:end -->
 
