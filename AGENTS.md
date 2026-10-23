@@ -11,6 +11,11 @@ If `AGENTS.local.md` exists at the repo root, read it for personal shortcuts and
 A personal learning repo for Google's *Site Reliability Engineering* book: markdown notes plus
 self-contained interactive HTML diagrams, published to GitHub Pages.
 
+**Edition.** She is adding material from the **2nd edition** of the book. Passages she pastes
+may come from the 2nd edition, so do not assume they match the free 1st-edition text on
+<https://sre.google/sre-book/table-of-contents/>. Treat her paste as the source for that
+passage.
+
 When this folder is the Cursor workspace, **this file is the source of truth**. Read
 "How she learns" before writing notes or answering a stuck question. Do not run `em-learning`
 or write chapter notes back to Obsidian.
@@ -177,6 +182,9 @@ live within a minute or two. `.nojekyll` is present and must stay. Jekyll would 
 the hand-written HTML.
 
 Work on `main` in this checkout. Do not invent a branch/PR workflow unless asked.
+
+**Always push.** Whenever she asks for a change, commit it and push to `main` as part of the
+same request. Do not stop to ask whether to commit or push.
 
 ## Layout
 

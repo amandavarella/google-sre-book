@@ -97,6 +97,19 @@ Several steps are mandatory in capacity planning:
 Because capacity is critical to availability, the SRE team must be in charge of capacity planning,
 which means they must also be in charge of provisioning.
 
+### A modern hierarchy of production health
+
+From the 2nd edition (Figure 1-2). A pyramid of six layers, listed here top to bottom as drawn.
+
+| Layer (top to bottom) | What it covers |
+|------|------|
+| 6. Emergent reliability | Reliable by default |
+| 5. Resilient products | Design and implementation |
+| 4. Infrastructure design | CI/CD (continuous integration and delivery), testing, data management, capacity, and similar |
+| 3. Continuous preparedness | Incident management, postmortems, training |
+| 2. Situational awareness | Monitoring, observability, alerting, toil tracking, goal setting |
+| 1. Sociotechnical foundations | A safe and empowering culture of continuous improvement |
+
 ## Key takeaways
 
 - SRE responsibilities interlock: emergency response, error budgets, efficiency, capacity
